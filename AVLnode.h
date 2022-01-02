@@ -46,9 +46,11 @@ public:
     std::shared_ptr<AVL_node<T,S>> select(std::shared_ptr<AVL_node<T,S>> root, int k);
     std::shared_ptr<AVL_node<T,S>> findClosestNodeFromAbove(std::shared_ptr<AVL_node<T,S>> root, int level);
     std::shared_ptr<AVL_node<T,S>> findClosestNodeFromBeneath(std::shared_ptr<AVL_node<T,S>> root, int level);
+    int findSumOfMHighestLevels(std::shared_ptr<AVL_node<T,S>> root, std::shared_ptr<AVL_node<T,S>> avl_node);
     void updateHeight();
     void updateBF();
     void updateNumOfChildren();
+    void updateInfo();
     T& getInfo();
     std::shared_ptr<AVL_node<T,S>>  getNodeWithBiggestKey(std::shared_ptr< AVL_node<T,S> > root);
 
@@ -82,12 +84,111 @@ public:
     std::shared_ptr<AVL_node<T,S>> sortedArrayToAVLtree(T infoArr[], S keyArr[],int start, int end,std::shared_ptr<AVL_node<T,S>> father);
     std::shared_ptr<AVL_node<T,S>> mergeAvlTrees(std::shared_ptr<AVL_node<T,S>> root1, std::shared_ptr<AVL_node<T,S>> root2,
                                                  T mergedInfoArr[] ,int m, int n);
+    S * cleanArray(T infoArr[],S keyArr[], int *counter,int size, T ** InfoArrPtr);
+//    void resetKeyArray(S arr[],int size);
+    void resetInfoArray(T arr[],int size);
+
 
     void swapNodes(std::shared_ptr<AVL_node<T,S>> node_to_delete,std::shared_ptr<AVL_node<T,S>> NextInOrderVal);
     void swapHeightAndBF(std::shared_ptr<AVL_node<T,S>> node_to_delete,std::shared_ptr<AVL_node<T,S>> NextInOrderVal);
 
 };
 
+template <class T, class S>
+S * AVL_node<T,S>::cleanArray(T infoArr[],S keyArr[], int *counter,int size, T ** InfoArrPtr)
+{
+    bool trash_found = false;
+    for(int i = 0; i< size; i++)
+    {
+        if(infoArr[i] == -1)
+        {
+            trash_found = true;
+            *counter = i+1;
+            break;
+        }
+    }
+    if(trash_found== false)
+    {
+        *InfoArrPtr = infoArr;
+        return keyArr;
+    }
+    else
+    {
+        S *cleankeys = new S[*counter];
+        T *cleanInfo = new T[*counter];
+        for(int i = 0; i< *counter; i++)
+        {
+            cleankeys[i] = keyArr[i];
+            cleanInfo[i] = infoArr[i];
+        }
+        *InfoArrPtr = cleanInfo;
+        return  cleankeys;
+    }
+
+}
+
+template <class T, class S>
+void AVL_node<T,S>::updateInfo()
+{
+    T left_info = 0;
+    if(this->getLeft_son() != nullptr){
+        left_info = this->getLeft_son()->info;
+    }
+
+    T right_info = 0;
+    if(this->getRight_son() != nullptr)
+    {
+        right_info = this->getRight_son()->info;
+    }
+    this->info = left_info + right_info + info;
+}
+
+template <class T, class S>
+void AVL_node<T,S>::resetInfoArray(T arr[],int size)
+{
+    for(int i = 0; i< size; i++)
+    {
+        arr[i] = -1;
+    }
+}
+
+
+
+template <class T, class S>
+int AVL_node<T,S>::findSumOfMHighestLevels(std::shared_ptr<AVL_node<T,S>> root, std::shared_ptr<AVL_node<T,S>> avl_node)
+{
+    int sum = root->info;
+    std::shared_ptr<AVL_node<T,S>> tmp = root;
+    while(tmp != nullptr)
+    {
+        if(tmp->key == avl_node->key)
+        {
+            if(tmp->left_son != nullptr)
+            {
+                sum = sum - tmp->left_son->info;
+            }
+            return sum;
+        }
+        if(tmp->key < avl_node->key)
+        {
+            if(tmp->left_son == nullptr)
+            {
+                sum = sum - tmp->info;
+            }
+            else
+            {
+                sum = sum - tmp->left_son->info - tmp->info;
+            }
+            tmp = tmp->right_son;
+        }
+        else
+        {
+            tmp = tmp->left_son;
+        }
+    }
+    return -1;
+
+}
 
 template <class T, class S>
 std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromBeneath(std::shared_ptr<AVL_node<T,S>> root, int level)
@@ -98,6 +199,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromBeneath(std::sh
     {
         if(tmp->key == level)
         {
+            closest = nullptr;
             return tmp;
         }
         if(tmp->key < level)
@@ -113,6 +215,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromBeneath(std::sh
             tmp = tmp->left_son;
         }
     }
+    tmp = nullptr;
     return closest;
 }
 
@@ -125,6 +228,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromAbove(std::shar
     {
         if(tmp->key == level)
         {
+            closest = nullptr;
             return tmp;
         }
         if(tmp->key < level)
@@ -140,6 +244,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromAbove(std::shar
             tmp = tmp->left_son;
         }
     }
+    tmp= nullptr;
     return closest;
 
 
@@ -201,15 +306,26 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::mergeAvlTrees(std::shared_ptr<AVL_
     int j = 0;
     storeInorder(root2, arr2Info,arr2keys, &j);
 
+    resetInfoArray(mergedInfoArr, m+n);
     S *mergedkeyArr = merge(arr1Info,arr1keys, arr2Info, arr2keys,mergedInfoArr, m, n);
+    int counter;
+    T ** clean_mergedInfoArr_ptr;
+    S *clean_mergedkeyArr = cleanArray(mergedInfoArr,mergedkeyArr,&counter,m+n,clean_mergedInfoArr_ptr);
 
-    std::shared_ptr<AVL_node<T,S>> mergedTrees = sortedArrayToAVLtree (mergedInfoArr,mergedkeyArr, 0, m + n - 1, nullptr);
+    std::shared_ptr<AVL_node<T,S>> mergedTrees = sortedArrayToAVLtree (*clean_mergedInfoArr_ptr,clean_mergedkeyArr, 0, counter - 1, nullptr);
 
     delete [] arr1keys;
     delete [] arr1Info;
     delete [] arr2keys;
     delete [] arr2Info;
     delete [] mergedkeyArr;
+
+    if(counter != m+n)
+    {
+        delete [] clean_mergedkeyArr;
+        delete [] *clean_mergedInfoArr_ptr;
+//        delete [] ;
+    }
 
     return mergedTrees;
 }
@@ -229,6 +345,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::sortedArrayToAVLtree(T infoArr[], 
     node->updateHeight();
     node->updateBF();
     node->updateNumOfChildren();
+    node->updateInfo();
     return node;
 }
 
@@ -260,6 +377,11 @@ S * AVL_node<T,S>::merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T 
             mergedKeyArr[k] = arr1Key[i];
             mergedInfoArr[k] = arr1Info[i];
             i++;
+        }
+        else if(arr1Key[i] == arr2Key[j]) // li shouldnt enter here
+        {
+            mergedKeyArr[k] = arr1Key[i]->getNumber() + arr2Key[i]->getNumber();
+            mergedInfoArr[k] = arr1Info[i];
         }
         else
         {
@@ -504,17 +626,20 @@ std::shared_ptr<AVL_node<T,S>>  AVL_node<T,S>::treeBalance(std::shared_ptr<AVL_n
         avl_node->father->updateHeight();
         avl_node->father->updateBF();
         avl_node->father->updateNumOfChildren();
+//        avl_node->father->updateInfo();
         if(avl_node->father->father)
         {
             avl_node->father->father->updateHeight();
             avl_node->father->father->updateBF();
             avl_node->father->father->updateNumOfChildren();
+//            avl_node->father->father->updateInfo();
         }
     }
     std::shared_ptr<AVL_node<T,S>> tmp = avl_node;
     while(avl_node != nullptr)
     {
         avl_node->updateHeightAndBF();   ///change function's name
+        avl_node->updateInfo();
         int bf = avl_node->BF;
         if( bf == INVALID_BF )
         {
@@ -617,8 +742,6 @@ template<class T,class S>
 std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::find(std::shared_ptr<AVL_node<T,S>> root,S key)
 {
     std::shared_ptr<AVL_node<T,S>> tmp = root;
-
-
     while(tmp != nullptr)
     {
         if(tmp->key == key)
@@ -634,6 +757,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::find(std::shared_ptr<AVL_node<T,S>
             tmp = tmp->left_son;
         }
     }
+    tmp = nullptr;
     return nullptr;
 }
 
@@ -812,14 +936,17 @@ void AVL_node<T,S>::swapHeightAndBF(std::shared_ptr<AVL_node<T,S>> node_to_delet
     int tmp_height = node_to_delete->height;
     int tmp_BF = node_to_delete->BF;
     int tmp_num_of_children = node_to_delete->num_of_children;
+    T tmp_info = node_to_delete->info;
 
     node_to_delete->height = NextInOrderVal->height;
     node_to_delete->BF = NextInOrderVal->BF;
     node_to_delete->num_of_children = NextInOrderVal->num_of_children;
+    node_to_delete->info = NextInOrderVal->info;
 
     NextInOrderVal->height = tmp_height;
     NextInOrderVal->BF = tmp_BF;
     NextInOrderVal->num_of_children = tmp_num_of_children;
+    NextInOrderVal->info = tmp_info;
 }
 
 
@@ -871,17 +998,20 @@ void AVL_node<T,S>::updateHeightAndBF()
         this->left_son->updateHeight();
         this->left_son->updateBF();
         this->left_son->updateNumOfChildren();
+//        this->left_son->updateInfo();
     }
     if(this->right_son != nullptr)
     {
         this->right_son->updateHeight();
         this->right_son->updateBF();
         this->right_son->updateNumOfChildren();
+//        this->right_son->updateInfo();
     }
 
     this->updateHeight();
     this->updateBF();
     this->updateNumOfChildren();
+//    this->updateInfo();
 
 }
 
@@ -1028,6 +1158,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::clone(const std::shared_ptr<AVL_no
     std::shared_ptr<AVL_node<T,S>> temp = (std::make_shared<AVL_node>(*root));
     temp->key  = root->key;
     temp->info = root->info;
+    temp->num_of_children = root->num_of_children;
     temp->father = parent;
     temp->left_son = clone(root->left_son,temp);
     temp->right_son = clone(root->right_son, temp);

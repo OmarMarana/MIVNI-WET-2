@@ -71,8 +71,12 @@ int main()
 
 //    std::shared_ptr<AVL_node<int,int>> node = root3->select(root3,7);
 
-    std::shared_ptr<AVL_node<int,int>> node = root->findClosestNodeFromAbove(root,9);
+//    std::shared_ptr<AVL_node<int,int>> node = root->findClosestNodeFromAbove(root,0);
+
+
+    std::shared_ptr<AVL_node<int,int>> node = root->select(root,5);
     printNode(node);
+    std::cout << root->findSumOfMHighestLevels(root, node) << std::endl ;
 
     std::cout << std::endl ;
      std::cout << "****************************************************************************************************" ;
