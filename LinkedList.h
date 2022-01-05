@@ -34,9 +34,26 @@ class LinkedList {
     ListNode<T,S>* LinkedListFind(S key);
     ListNode<T,S>* LinkedListGetHead();
     void LinkedListSetHead(ListNode<T,S>* node);
+    void clearList();
 
 
 };
+
+template<class T, class S>
+void LinkedList<T,S>::clearList()
+{
+    if(head == nullptr)
+    {
+        return;
+    }
+    while(head != nullptr) // check if the negligence of prev and next causes problems
+    {
+        auto tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+
+}
 
 template<class T, class S>
 S ListNode<T,S>::getKey()
