@@ -14,7 +14,8 @@ class ListNode{
     S key;
     ListNode* next;
     ListNode* prev;
-
+    S getKey();
+    T getInfo();
 
         ListNode(T info, S key) : info(info), key(key), next(nullptr), prev(nullptr) {};
 };
@@ -38,6 +39,17 @@ class LinkedList {
 };
 
 template<class T, class S>
+S ListNode<T,S>::getKey()
+{
+    return key;
+}
+template<class T, class S>
+T ListNode<T,S>::getInfo()
+{
+    return info;
+}
+
+template<class T, class S>
 ListNode<T,S>* LinkedList<T,S>::LinkedListGetHead()
 {
     return this->head;
@@ -55,7 +67,7 @@ ListNode<T,S>* LinkedList<T,S>::LinkedListFind(S key)
     {
         return nullptr;
     }
-    ListNode<T,S>* tmp = head->next;
+    ListNode<T,S>* tmp = head;
     while(tmp != nullptr)
     {
         if(tmp->key == key)
@@ -95,7 +107,7 @@ void LinkedList<T,S>::LinkedListRemove(S key)
     {
         ListNode<T,S>* tmp = head;
         head = head->next;
-        head->prev = nullptr;
+//        head->prev = nullptr;
         delete tmp;
         return;
     }
