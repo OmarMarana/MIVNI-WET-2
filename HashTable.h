@@ -30,8 +30,15 @@ class HashTable {
         ListNode<T,S> * HashTableSearch(S key);
         void resizeHashTable();
         void CopyElements(LinkedList<T,S> * hash_table_dest, LinkedList<T,S> * hash_table_src, int src_size);
+        int getSize();
 
 };
+
+template<class T, class S>
+int  HashTable<T,S>::getSize()
+{
+    return  size;
+}
 
 template<class T, class S>
 void HashTable<T,S>::CopyElements(LinkedList<T,S> * hash_table_dest, LinkedList<T,S> * hash_table_src, int src_size)
