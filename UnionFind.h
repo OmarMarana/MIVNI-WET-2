@@ -11,6 +11,7 @@
 
 
 class UnionFind {
+
     Group ** groups;
     GroupOfGroups** groupOfGroups;
     int K;

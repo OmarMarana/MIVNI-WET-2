@@ -91,8 +91,59 @@ public:
 
     void swapNodes(std::shared_ptr<AVL_node<T,S>> node_to_delete,std::shared_ptr<AVL_node<T,S>> NextInOrderVal);
     void swapHeightAndBF(std::shared_ptr<AVL_node<T,S>> node_to_delete,std::shared_ptr<AVL_node<T,S>> NextInOrderVal);
+    int countNodes(std::shared_ptr<AVL_node<T,S>> root);
+    int sumInfoOfHighest(std::shared_ptr<AVL_node<T,S>> root,S key);
+
 
 };
+
+
+template <class T, class S>
+int  AVL_node<T,S>::sumInfoOfHighest(std::shared_ptr<AVL_node<T,S>> root,S key)
+{
+    int sum = root->info;
+    std::shared_ptr<AVL_node<T,S>> tmp = root;
+    while(tmp != nullptr)
+    {
+        if(tmp->key == key)
+        {
+            if(tmp->left_son != nullptr)
+            {
+                sum -=tmp->left_son()->info;
+            }
+            return sum;
+        }
+        if(tmp->key < key)
+        {
+            sum -= tmp->key.getNumber();
+            if(tmp->left_son != nullptr)
+            {
+                sum -=tmp->left_son()->info;
+            }
+            tmp = tmp->right_son;
+        }
+        else
+        {
+            tmp = tmp->left_son;
+        }
+    }
+    tmp = nullptr;
+    return -1;
+
+}
+
+
+template <class T, class S>
+int AVL_node<T,S>::countNodes(std::shared_ptr<AVL_node<T,S>> root)
+{
+    if(root== nullptr)
+    {
+        return 0;
+
+    }
+    return 1 + countNodes(root->left_son) + countNodes(root->right_son);
+}
+
 
 template <class T, class S>
 S * AVL_node<T,S>::cleanArray(T infoArr[],S keyArr[], int *counter,int size, T ** InfoArrPtr)
@@ -140,7 +191,7 @@ void AVL_node<T,S>::updateInfo()
     {
         right_info = this->getRight_son()->info;
     }
-    this->info = left_info + right_info + info;
+    this->info = left_info + right_info + key;
 }
 
 template <class T, class S>
@@ -696,28 +747,15 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::leftRotation(std::shared_ptr<AVL_n
         new_root_left_son->father = root;
 
     }
-
-    if(new_root->left_son->left_son == nullptr)
+    if(new_root->left_son)
     {
-        if(new_root->left_son->right_son == nullptr  )
-        {
-            new_root->left_son->info =   new_root->left_son->key;//add ->getNumber() in last argumnet of +
-        }
-        new_root->left_son->info = new_root->left_son->right_son->info + new_root->left_son->key;//add ->getNumber() in last argumnet of +
-
+        new_root->left_son->updateInfo();
     }
-    else
+    if(new_root->right_son)
     {
-        new_root->left_son->info = new_root->left_son->left_son->info + new_root->left_son->right_son->info + new_root->left_son->key;//add ->getNumber() in last argumnet of +
+        new_root->right_son->updateInfo();
     }
-    if(new_root->right_son == nullptr)
-    {
-        new_root->info = new_root->left_son->info  + new_root->key;//add ->getNumber() in last argumnet of +
-    }
-    else
-    {
-        new_root->info = new_root->left_son->info + new_root->right_son->info + new_root->key;//add ->getNumber() in last argumnet of +
-    }
+    new_root->updateInfo();
 
     return new_root;
 
@@ -756,29 +794,15 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::rightRotation(std::shared_ptr<AVL_
     {
         new_root_right_son->father = root;
     }
-
-    if(new_root->right_son->left_son == nullptr)
+    if(new_root->left_son)
     {
-        if(new_root->right_son->right_son == nullptr  )
-        {
-            new_root->right_son->info =   new_root->right_son->key; //add ->getNumber() in last argumnet of +
-        }
-        new_root->right_son->info = new_root->right_son->right_son->info + new_root->right_son->key;//add ->getNumber() in last argumnet of +
-
+        new_root->left_son->updateInfo();
     }
-    else
+    if(new_root->right_son)
     {
-        new_root->right_son->info = new_root->right_son->left_son->info + new_root->right_son->right_son->info + new_root->right_son->key;//add ->getNumber() in last argumnet of +
+        new_root->right_son->updateInfo();
     }
-    if(new_root->left_son == nullptr)
-    {
-        new_root->info = new_root->right_son->info  + new_root->key;//add ->getNumber() in last argumnet of +
-    }
-    else
-    {
-        new_root->info = new_root->left_son->info + new_root->right_son->info + new_root->key;//add ->getNumber() in last argumnet of +
-    }
-
+    new_root->updateInfo();
     return new_root;
 }
 

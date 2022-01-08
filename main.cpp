@@ -43,6 +43,8 @@ int main()
      root = root->insert(root,3,3);
      root = root->treeBalance(root->find(root,3));
 
+     std::cout << root->countNodes(root)<< std::endl;
+
 
 //    std::shared_ptr<AVL_node<int,int>> root2;
 //    root2 = root2->insert(root2,12,12);
@@ -73,14 +75,14 @@ int main()
 
 //    std::shared_ptr<AVL_node<int,int>> node = root->findClosestNodeFromAbove(root,0);
 
-
-    std::shared_ptr<AVL_node<int,int>> node = root->select(root,5);
-    printNode(node);
-    std::cout << root->findSumOfMHighestLevels(root, node) << std::endl ;
-
-    std::cout << std::endl ;
-     std::cout << "****************************************************************************************************" ;
-     std::cout << std::endl ;
+//
+//    std::shared_ptr<AVL_node<int,int>> node = root->select(root,5);
+//    printNode(node);
+//    std::cout << root->findSumOfMHighestLevels(root, node) << std::endl ;
+//
+//    std::cout << std::endl ;
+//     std::cout << "****************************************************************************************************" ;
+//     std::cout << std::endl ;
 
 //     root2->inOrder(root2,printNode);
 //     std::cout << std::endl ;

@@ -9,7 +9,8 @@
 #include "AVLnode.h"
 #include "LevelAndId.h"
 #include "LevelAndNumber.h"
-
+#define FAILURE -1
+#define SUCCESS 0
 
 class GroupOfGroups {
 
@@ -24,11 +25,13 @@ class GroupOfGroups {
         int* scaleLevel0Array;
         int num_of_players_with_positive_level;
         int num_of_players;
+        int num_of_groups;
+//        int num_of_positive_levels;
 
     public:
         GroupOfGroups(int k, int scale) : scale(scale) ,playersHT(k), level_and_id_player_tree(nullptr), level_and_number_player_tree(
                 nullptr),scaleTreeArray(new std::shared_ptr<AVL_node<int,LevelAndNumber>>[scale]) ,scaleLevel0Array(new int[scale]),
-                num_of_players_with_positive_level(0), num_of_players(0)
+                num_of_players_with_positive_level(0), num_of_players(0) , num_of_groups(1)
                 {
                     for (int i = 0; i < scale; ++i)
                     {
@@ -38,12 +41,209 @@ class GroupOfGroups {
         }
         ~GroupOfGroups();
         void insetToScaleTreeArray(LevelAndNumber ln, int score);
-        void removePlayer(int player_id);
-        void addPlayer(int player_id, int group_id, int score);
+        void removePlayerID(int player_id);
+        void addPlayerID(int player_id, int group_id, int score);
         void increaseLevel(int player_id , int delta);
+        void changeScore(int player_id , int new_score);
+        void mergeGroupOfGroups(GroupOfGroups* groupOfGroups1 , GroupOfGroups* groupOfGroups2);
+        void mergeGroupOfGroupsHelper(GroupOfGroups* groupOfGroups_dest , GroupOfGroups* groupOfGroups_src);
+        HashTable<Player,int>* GetPlayersHT();
+        //return -1 incase of FAILURE ELSE RETURN 0
+        int getPercentOfPlayers ( int score, int lowerLevel, int higherLevel, double * players);
+        void averageHighestPlayerLevelByGroup(int m, double * avgLevel);
 
 
 };
+
+
+void GroupOfGroups::averageHighestPlayerLevelByGroup(int m, double * avgLevel)
+{
+    int sum =0;
+
+    if(m <= num_of_players_with_positive_level)
+    {
+        auto LInode = level_and_id_player_tree->select(level_and_id_player_tree,num_of_players_with_positive_level-m+1);
+        sum = level_and_id_player_tree->sumInfoOfHighest(level_and_id_player_tree,LInode->getKey());
+        *avgLevel = sum/m;
+        return;
+    }
+    else
+    {
+        *avgLevel = level_and_number_player_tree->getInfo()/m;
+        return;
+    }
+
+}
+
+
+int GroupOfGroups::getPercentOfPlayers ( int score, int lowerLevel, int higherLevel, double * players)
+{
+    auto LBnode = scaleTreeArray[score]->findClosestNodeFromAbove(scaleTreeArray[score],lowerLevel);
+    auto HBnode = scaleTreeArray[score]->findClosestNodeFromBeneath(scaleTreeArray[score],higherLevel);
+
+    if(HBnode== nullptr || LBnode== nullptr || HBnode->getKey().getLevel() < LBnode->getKey().getLevel())
+    {
+        return FAILURE; // catch FAILURE in DS func
+    }
+
+    int nominator = scaleTreeArray[score]->getInfo();
+    if(LBnode->getLeft_son()== nullptr)
+    {
+        nominator -= LBnode->getLeft_son()->getInfo();
+    }
+    if(HBnode->getRight_son()== nullptr)
+    {
+        nominator -= HBnode->getRight_son()->getInfo();
+    }
+
+
+    auto LBnodeGlobal = level_and_number_player_tree->findClosestNodeFromAbove(level_and_number_player_tree,lowerLevel);
+    auto HBnodeGlobal = level_and_number_player_tree->findClosestNodeFromBeneath(level_and_number_player_tree,higherLevel);
+
+    if(HBnodeGlobal== nullptr || LBnodeGlobal== nullptr || HBnodeGlobal->getKey().getLevel() < LBnodeGlobal->getKey().getLevel())
+    {
+        return FAILURE; // catch FAILURE in DS func
+    }
+
+    int denominator = level_and_number_player_tree->getInfo();
+    if(LBnodeGlobal->getLeft_son()== nullptr)
+    {
+        denominator -= LBnodeGlobal->getLeft_son()->getInfo();
+    }
+    if(HBnodeGlobal->getRight_son()== nullptr)
+    {
+        denominator -= HBnode->getRight_son()->getInfo();
+    }
+
+    if(lowerLevel <=0)
+    {
+        nominator += scaleLevel0Array[score];
+        int sum=0;
+        for (int i = 0; i < scale; ++i) {
+            sum+= scaleLevel0Array[i];
+        }
+        denominator += sum;
+    }
+
+    *players = nominator/denominator;
+    return SUCCESS;
+
+
+}
+
+HashTable<Player,int>* GroupOfGroups::GetPlayersHT()
+{
+    return &playersHT;
+}
+
+void GroupOfGroups::mergeGroupOfGroupsHelper(GroupOfGroups* groupOfGroups_dest , GroupOfGroups* groupOfGroups_src)
+{
+    auto src_HT = groupOfGroups_src->GetPlayersHT();
+    auto dest_HT = groupOfGroups_dest->GetPlayersHT();
+    for (int i = 0; i < src_HT->getSize(); ++i)
+    {
+        auto tmp = (*src_HT).getHT()[i].LinkedListGetHead();
+        while (tmp != nullptr)
+        {
+               dest_HT->HashTableInsert(tmp->getInfo(),tmp->getKey());
+        }
+    }
+
+    int m = groupOfGroups_dest->num_of_players_with_positive_level;
+    int n = groupOfGroups_src->num_of_players_with_positive_level;
+    int* mergedLevelSumArray= new int[m+n];
+    auto new_dest_tree = groupOfGroups_dest->level_and_id_player_tree->mergeAvlTrees(groupOfGroups_dest->level_and_id_player_tree,
+     groupOfGroups_src->level_and_id_player_tree,mergedLevelSumArray,m,n);
+    groupOfGroups_dest->level_and_id_player_tree->postOrderAndDestroy(groupOfGroups_dest->level_and_id_player_tree);
+    groupOfGroups_src->level_and_id_player_tree->postOrderAndDestroy(groupOfGroups_src->level_and_id_player_tree);
+    groupOfGroups_dest->level_and_id_player_tree= new_dest_tree;
+    delete [] mergedLevelSumArray;
+
+
+    m = groupOfGroups_dest->level_and_number_player_tree->countNodes( groupOfGroups_dest->level_and_number_player_tree);
+    n = groupOfGroups_src->level_and_number_player_tree->countNodes( groupOfGroups_src->level_and_number_player_tree);
+    int* mergedLevelSumArray1= new int[m+n];
+    auto new_dest_tree1 = groupOfGroups_dest->level_and_number_player_tree->mergeAvlTrees(groupOfGroups_dest->level_and_number_player_tree,
+                                                                                     groupOfGroups_src->level_and_number_player_tree,mergedLevelSumArray1,m,n);
+    groupOfGroups_dest->level_and_number_player_tree->postOrderAndDestroy(groupOfGroups_dest->level_and_number_player_tree);
+    groupOfGroups_src->level_and_number_player_tree->postOrderAndDestroy(groupOfGroups_src->level_and_number_player_tree);
+    groupOfGroups_dest->level_and_number_player_tree= new_dest_tree1;
+    delete [] mergedLevelSumArray1;
+
+
+    for (int i = 0; i < scale; ++i)
+    {
+        m = groupOfGroups_dest->scaleTreeArray[i]->countNodes(groupOfGroups_dest->scaleTreeArray[i]);
+        n = groupOfGroups_src->scaleTreeArray[i]->countNodes(groupOfGroups_src->scaleTreeArray[i]);
+        int* mergedLevelSumArray2= new int[m+n];
+        auto new_dest_tree2 = groupOfGroups_dest->scaleTreeArray[i]->mergeAvlTrees(groupOfGroups_dest->scaleTreeArray[i],
+                                                                                              groupOfGroups_src->scaleTreeArray[i],mergedLevelSumArray2,m,n);
+        groupOfGroups_dest->scaleTreeArray[i]->postOrderAndDestroy(groupOfGroups_dest->scaleTreeArray[i]);
+        groupOfGroups_src->scaleTreeArray[i]->postOrderAndDestroy(groupOfGroups_src->scaleTreeArray[i]);
+        groupOfGroups_dest->scaleTreeArray[i]= new_dest_tree2;
+        delete [] mergedLevelSumArray2;
+
+        groupOfGroups_dest->scaleLevel0Array[i] +=groupOfGroups_src->scaleLevel0Array[i];
+    }
+
+    groupOfGroups_dest->num_of_players +=groupOfGroups_src->num_of_players;
+
+    groupOfGroups_dest->num_of_players_with_positive_level +=groupOfGroups_src->num_of_players_with_positive_level;
+
+    groupOfGroups_dest->num_of_groups +=groupOfGroups_src->num_of_groups;
+}
+
+
+void GroupOfGroups::mergeGroupOfGroups(GroupOfGroups* groupOfGroups1 , GroupOfGroups* groupOfGroups2)
+{
+    if(groupOfGroups1->num_of_groups >= groupOfGroups2->num_of_groups)
+    {
+        mergeGroupOfGroupsHelper(groupOfGroups1,groupOfGroups2);
+    }
+    else
+    {
+        mergeGroupOfGroupsHelper(groupOfGroups2,groupOfGroups1);
+    }
+}
+
+
+void GroupOfGroups::changeScore(int player_id , int new_score)
+{
+    auto hashNode = playersHT.HashTableSearch(player_id);
+    auto old_score = hashNode->getInfo().getScore();
+    auto level = hashNode->getInfo().getLevel();
+    hashNode->getInfo().setScore(new_score);
+
+    if(level == 0)
+    {
+        scaleLevel0Array[old_score]--;
+        scaleLevel0Array[new_score]++;
+    }
+    else
+    {
+
+        LevelAndNumber ln(level,0);
+        auto lnNode= scaleTreeArray[old_score]->find(scaleTreeArray[old_score],ln);
+        int old_number  = lnNode->getKey().getNumber();
+        scaleTreeArray[old_score] =scaleTreeArray[old_score]->deleteNode(scaleTreeArray[old_score] ,ln);
+        if(old_number != 1)
+        {
+            LevelAndNumber ln1(level,old_number-1);
+            scaleTreeArray[old_score] = scaleTreeArray[old_score]->insert(scaleTreeArray[old_score],ln1,0);
+            scaleTreeArray[old_score] = scaleTreeArray[old_score]->treeBalance(scaleTreeArray[old_score]->find(scaleTreeArray[old_score],ln1));
+        }
+
+        auto lnNode1= scaleTreeArray[new_score]->find(scaleTreeArray[new_score],ln);
+        int old_number1  = lnNode1->getKey().getNumber();
+        scaleTreeArray[new_score] =scaleTreeArray[new_score]->deleteNode(scaleTreeArray[new_score] ,ln);
+
+        LevelAndNumber ln2(level,old_number1+1);
+        scaleTreeArray[new_score] = scaleTreeArray[new_score]->insert(scaleTreeArray[new_score],ln2,0);
+        scaleTreeArray[new_score] = scaleTreeArray[new_score]->treeBalance(scaleTreeArray[new_score]->find(scaleTreeArray[new_score],ln2));
+
+    }
+
+}
 
 
 void GroupOfGroups::increaseLevel(int player_id , int delta)
@@ -108,24 +308,46 @@ void GroupOfGroups::increaseLevel(int player_id , int delta)
         int old_number = lnNode->getKey().getNumber();
 
         level_and_number_player_tree = level_and_number_player_tree->deleteNode(level_and_number_player_tree,ln2);
-        if(lnNode->getKey().getNumber()  != 1)
+        if(old_number  != 1)
         {
-            int old_number = lnNode->getKey().getNumber();
+//            int old_number = lnNode->getKey().getNumber();
             LevelAndNumber ln1(old_level , old_number-1);
             level_and_number_player_tree = level_and_number_player_tree->insert(level_and_number_player_tree,ln1,0);
             level_and_number_player_tree = level_and_number_player_tree->treeBalance(level_and_number_player_tree->find(level_and_number_player_tree,ln1));
         }
 
 
-
-
 //        LevelAndNumber ln4(old_level+delta, old_number);
-        LevelAndNumber ln4(old_level + delta, old_number+1);
+        LevelAndNumber ln4(old_level + delta, 1);
+        auto lnNode2 = level_and_number_player_tree->find(level_and_number_player_tree,ln4);
+        int old_number2 = lnNode2->getKey().getNumber();
+        ln4.setNumber(old_number2+1);
         level_and_number_player_tree = level_and_number_player_tree->deleteNode(level_and_number_player_tree, ln4);
         level_and_number_player_tree = level_and_number_player_tree->insert(level_and_number_player_tree,ln4,0);
         level_and_number_player_tree = level_and_number_player_tree->treeBalance(level_and_number_player_tree->find(level_and_number_player_tree,ln4));
 
 
+        LevelAndNumber ln3(old_level,1);
+        auto lnNode1 = level_and_number_player_tree->find(level_and_number_player_tree,ln3);
+        int old_number1 = lnNode1->getKey().getNumber();
+
+        scaleTreeArray[score] = scaleTreeArray[score]->deleteNode(scaleTreeArray[score],ln3);
+        if(old_number1  != 1)
+        {
+//            int old_number = lnNode->getKey().getNumber();
+            LevelAndNumber ln1(old_level , old_number-1);
+            scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln1,0);
+            scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln1));
+        }
+
+//        LevelAndNumber ln4(old_level+delta, old_number);
+        LevelAndNumber ln5(old_level + delta, 1);
+        auto lnNode3 = level_and_number_player_tree->find(level_and_number_player_tree,ln5);
+        int old_number3 = lnNode3->getKey().getNumber();
+        ln5.setNumber(old_number3+1);
+        scaleTreeArray[score] = scaleTreeArray[score]->deleteNode(scaleTreeArray[score], ln5);
+        scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln5,0);
+        scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln5));
 
     }
 
@@ -133,9 +355,10 @@ void GroupOfGroups::increaseLevel(int player_id , int delta)
 
 
 
+
 }
 
-void GroupOfGroups::addPlayer(int player_id, int group_id, int score)
+void GroupOfGroups::addPlayerID(int player_id, int group_id, int score)
 {
     Player player(player_id,group_id,score);
     playersHT.HashTableInsert(player,player_id);
@@ -147,7 +370,7 @@ void GroupOfGroups::addPlayer(int player_id, int group_id, int score)
 
 
 
-void GroupOfGroups::removePlayer(int player_id)
+void GroupOfGroups::removePlayerID(int player_id)
 {
     auto node = playersHT.HashTableSearch(player_id);
     Player player = node->getInfo();
