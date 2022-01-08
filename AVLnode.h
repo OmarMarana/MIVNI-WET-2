@@ -191,7 +191,7 @@ void AVL_node<T,S>::updateInfo()
     {
         right_info = this->getRight_son()->info;
     }
-    this->info = left_info + right_info + key;
+    this->info = left_info + right_info + key->getNumber();
 }
 
 template <class T, class S>
