@@ -393,8 +393,8 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::mergeAvlTrees(std::shared_ptr<AVL_
 
     resetInfoArray(mergedInfoArr, m+n);
     S *mergedkeyArr = merge(arr1Info,arr1keys, arr2Info, arr2keys,mergedInfoArr, m, n);
-    int counter;
-    T ** clean_mergedInfoArr_ptr;
+    int counter  = m+n;
+    T ** clean_mergedInfoArr_ptr = &mergedInfoArr;
     S *clean_mergedkeyArr = cleanArray(mergedInfoArr,mergedkeyArr,&counter,m+n,clean_mergedInfoArr_ptr);
 
     std::shared_ptr<AVL_node<T,S>> mergedTrees = sortedArrayToAVLtree (*clean_mergedInfoArr_ptr,clean_mergedkeyArr, 0, counter - 1, nullptr);

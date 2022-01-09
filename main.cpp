@@ -48,9 +48,23 @@ int main()
     label2->increaseLevel(3,5);
 //    label2->increaseLevel(6,5);
 
+
+    auto label3 = uf1.Find(3);
+    label3->addPlayerID(6,3,1);
+    label3->addPlayerID(7,3,1);
+    label3->addPlayerID(8,3,1);
+
+    uf1.Union(2,3);
+    label2->increaseLevel(7,8);
+    label2->increaseLevel(8,8);
+
     double per=0;
     std::cout << label2->getPercentOfPlayers(3,7,5,&per) << std::endl;
     std::cout << per<< std::endl;
+
+    double avg =0;
+    label2->averageHighestPlayerLevelByGroup(3,&avg);
+    std::cout << avg<< std::endl;
 
     std::cout << "succeess";
 

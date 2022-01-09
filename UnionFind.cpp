@@ -12,10 +12,12 @@ void UnionFind::Union(int group_id1, int group_id2)
 
     int gog1_index = group_of_groups1->getIndex();
     int gog2_index =group_of_groups2->getIndex();
+    int num_of_groups1 = group_of_groups1->getNumOfGroups();
+    int num_of_groups2 = group_of_groups2->getNumOfGroups();
     group_of_groups1->mergeGroupOfGroups(group_of_groups1,group_of_groups2);
 
 
-    if(group_of_groups1->getNumOfGroups() >= group_of_groups2->getNumOfGroups())
+    if(num_of_groups1>= num_of_groups2)
     {
         groupOfGroups[gog2_index] = nullptr;
     }

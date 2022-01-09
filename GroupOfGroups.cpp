@@ -29,7 +29,7 @@ Group* GroupOfGroups::getRoot()
 
 void GroupOfGroups::averageHighestPlayerLevelByGroup(int m, double * avgLevel)
 {
-    int sum =0;
+    double sum =0;
 
     if(m <= num_of_players_with_positive_level)
     {
@@ -153,6 +153,7 @@ void GroupOfGroups::mergeGroupOfGroupsHelper(GroupOfGroups* groupOfGroups_dest ,
         while (tmp != nullptr)
         {
             dest_HT->HashTableInsert(tmp->getInfo(),tmp->getKey());
+            tmp = tmp->next;
         }
     }
 

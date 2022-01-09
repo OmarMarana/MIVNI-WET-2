@@ -16,7 +16,7 @@ class UnionFind {
         int k;
 
     public:
-        UnionFind(int scale , int k) : scale(scale) , k(k), groups(new Group*[k+1]) , groupOfGroups(new GroupOfGroups*[k+1])
+        UnionFind(int scale , int k) : scale(scale) , groups(new Group*[k+1]) , groupOfGroups(new GroupOfGroups*[k+1]) , k(k)
         {
             for (int i = 0; i < k+1; ++i)
             {
