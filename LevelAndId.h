@@ -17,6 +17,7 @@ public:
 
     int getId() const;
     int getNumber() const;
+    void setNumber(int new_number);
 
     bool operator==(const LevelAndId& other) const ;     // check how to declare as friend
     bool operator<(const LevelAndId& other) const ;

@@ -109,7 +109,7 @@ int  AVL_node<T,S>::sumInfoOfHighest(std::shared_ptr<AVL_node<T,S>> root,S key)
         {
             if(tmp->left_son != nullptr)
             {
-                sum -=tmp->left_son()->info;
+                sum -=tmp->left_son->info;
             }
             return sum;
         }
@@ -118,7 +118,7 @@ int  AVL_node<T,S>::sumInfoOfHighest(std::shared_ptr<AVL_node<T,S>> root,S key)
             sum -= tmp->key.getNumber();
             if(tmp->left_son != nullptr)
             {
-                sum -=tmp->left_son()->info;
+                sum -=tmp->left_son->info;
             }
             tmp = tmp->right_son;
         }
@@ -191,7 +191,7 @@ void AVL_node<T,S>::updateInfo()
     {
         right_info = this->getRight_son()->info;
     }
-    this->info = left_info + right_info + key->getNumber();
+    this->info = left_info + right_info + key.getNumber();
 }
 
 template <class T, class S>
@@ -248,14 +248,14 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromBeneath(std::sh
     std::shared_ptr<AVL_node<T,S>> tmp = root;
     while(tmp != nullptr)
     {
-        if(tmp->key == level)
+        if(tmp->key.getLevel()  == level)
         {
             closest = nullptr;
             return tmp;
         }
-        if(tmp->key < level)
+        if(tmp->key.getLevel()  < level)
         {
-            if(closest == nullptr || closest->key - level < tmp->key - level)
+            if(closest == nullptr || closest->key.getLevel()  - level < tmp->key.getLevel()  - level)
             {
                 closest = tmp;
             }
@@ -277,18 +277,18 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::findClosestNodeFromAbove(std::shar
     std::shared_ptr<AVL_node<T,S>> tmp = root;
     while(tmp != nullptr)
     {
-        if(tmp->key == level)
+        if(tmp->key.getLevel() == level)
         {
             closest = nullptr;
             return tmp;
         }
-        if(tmp->key < level)
+        if(tmp->key.getLevel() < level)
         {
             tmp = tmp->right_son;
         }
         else // if we got here then tmp->key > key
         {
-            if(closest == nullptr || closest->key - level > tmp->key - level)
+            if(closest == nullptr || closest->key.getLevel()  - level > tmp->key.getLevel()  - level)
             {
                 closest = tmp;
             }
@@ -431,7 +431,7 @@ S * AVL_node<T,S>::merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T 
         }
         else if(arr1Key[i] == arr2Key[j]) // li shouldnt enter here
         {
-            mergedKeyArr[k] = arr1Key[i]->getNumber() + arr2Key[i]->getNumber();
+            mergedKeyArr[k].setNumber(arr1Key[i].getNumber() + arr2Key[i].getNumber());
             mergedInfoArr[k] = arr1Info[i];
         }
         else

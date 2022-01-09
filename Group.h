@@ -22,30 +22,7 @@ public:
 
 };
 
-void Group::setFather(Group * newFather)
-{
-    father = newFather;
-}
 
-void Group::setLabel(GroupOfGroups * newLabel)
-{
-       label = newLabel;
-}
-
-Group * Group::getFather()
-{
-    return father;
-}
-
-GroupOfGroups * Group::getLabel()
-{
-    return label;
-}
-
-int Group::getGroupId()
-{
-    return group_id;
-}
 
 
 #endif //MIVNI2_GROUP_H

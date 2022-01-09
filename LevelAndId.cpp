@@ -56,6 +56,11 @@ int LevelAndId::getId() const
     return Id;
 }
 
+void LevelAndId::setNumber(int new_number)
+{
+    Level = new_number;
+}
+
 
 
 
