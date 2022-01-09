@@ -10,20 +10,34 @@ void UnionFind::Union(int group_id1, int group_id2)
     auto group_of_groups1 = Find(group_id1);
     auto group_of_groups2 = Find(group_id2);
 
+    int gog1_index = group_of_groups1->getIndex();
+    int gog2_index =group_of_groups2->getIndex();
     group_of_groups1->mergeGroupOfGroups(group_of_groups1,group_of_groups2);
+
+
+    if(group_of_groups1->getNumOfGroups() >= group_of_groups2->getNumOfGroups())
+    {
+        groupOfGroups[gog2_index] = nullptr;
+    }
+    else
+    {
+        groupOfGroups[gog1_index] = nullptr;
+    }
+
+
 
 }
 
 GroupOfGroups* UnionFind::Find(int group_id)
 {
 
-    auto root = groups[group_id-1];
+    auto root = groups[group_id];
     while (root->getFather() != nullptr)
     {
 
         root = root->getFather();
     }
-    auto iterator = groups[group_id-1];
+    auto iterator = groups[group_id];
     Group* temp;
     while (iterator->getFather() != root&& iterator!= root)
     {
@@ -39,7 +53,7 @@ GroupOfGroups* UnionFind::Find(int group_id)
 
 UnionFind::~UnionFind()
 {
-    for (int i = 0; i < k; ++i)
+    for (int i = 0; i < k+1; ++i)
     {
         delete groups[i];
         delete groupOfGroups[i];

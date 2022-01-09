@@ -38,6 +38,19 @@ int main()
     auto label2 = uf1.Find(2);
     label2->addPlayerID(4,2,0);
     label2->addPlayerID(5,2,0);
+//    label2->addPlayerID(6,2,1);
+
+
+    label2->increaseLevel(4,1);
+    label2->increaseLevel(2,2);
+    label2->increaseLevel(1,3);
+    label2->increaseLevel(5,4);
+    label2->increaseLevel(3,5);
+//    label2->increaseLevel(6,5);
+
+    double per=0;
+    std::cout << label2->getPercentOfPlayers(3,7,5,&per) << std::endl;
+    std::cout << per<< std::endl;
 
     std::cout << "succeess";
 

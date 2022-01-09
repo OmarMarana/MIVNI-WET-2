@@ -4,6 +4,29 @@
 
 #include "GroupOfGroups.h"
 
+
+int GroupOfGroups::getNumOfGroups()
+{
+    return num_of_groups;
+}
+
+
+int GroupOfGroups::getIndex()
+{
+    return index;
+}
+
+
+void GroupOfGroups::setRoot(Group* new_root)
+{
+    root = new_root;
+}
+
+Group* GroupOfGroups::getRoot()
+{
+    return root;
+}
+
 void GroupOfGroups::averageHighestPlayerLevelByGroup(int m, double * avgLevel)
 {
     int sum =0;
@@ -29,20 +52,53 @@ int GroupOfGroups::getPercentOfPlayers ( int score, int lowerLevel, int higherLe
     auto LBnode = scaleTreeArray[score]->findClosestNodeFromAbove(scaleTreeArray[score],lowerLevel);
     auto HBnode = scaleTreeArray[score]->findClosestNodeFromBeneath(scaleTreeArray[score],higherLevel);
 
-    if(HBnode== nullptr || LBnode== nullptr || HBnode->getKey().getLevel() < LBnode->getKey().getLevel())
+
+    double denominator =0;
+    double nominator =0;
+
+    if(scaleTreeArray[score] == nullptr)
     {
-        return FAILURE; // catch FAILURE in DS func
+        if(lowerLevel <= 0)
+        {
+            if(scaleLevel0Array[score] == 0)
+            {
+                *players = 0;
+                return SUCCESS;
+            }
+            else
+            {
+                nominator = scaleLevel0Array[score];
+            }
+        }
+        else
+        {
+            *players = 0;
+            return SUCCESS;
+        }
+    }
+    else
+    {
+        if(HBnode== nullptr || LBnode== nullptr || HBnode->getKey().getLevel() < LBnode->getKey().getLevel())
+        {
+            return FAILURE; // catch FAILURE in DS func
+        }
+
+        int higher_than_HB = scaleTreeArray[score]->sumInfoOfHighest(scaleTreeArray[score],HBnode->getKey()) - HBnode->getKey().getNumber();
+        int lower_than_LB = scaleTreeArray[score]->sumInfoOfLowest(scaleTreeArray[score],LBnode->getKey()) - LBnode->getKey().getNumber();
+        nominator = scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
     }
 
-    int nominator = scaleTreeArray[score]->getInfo();
-    if(LBnode->getLeft_son()== nullptr)
-    {
-        nominator -= LBnode->getLeft_son()->getInfo();
-    }
-    if(HBnode->getRight_son()== nullptr)
-    {
-        nominator -= HBnode->getRight_son()->getInfo();
-    }
+
+
+
+//    if(LBnode->getLeft_son()!= nullptr)
+//    {
+//        nominator -= LBnode->getLeft_son()->getInfo();
+//    }
+//    if(HBnode->getRight_son()!= nullptr)
+//    {
+//        nominator -= HBnode->getRight_son()->getInfo();
+//    }
 
 
     auto LBnodeGlobal = level_and_number_player_tree->findClosestNodeFromAbove(level_and_number_player_tree,lowerLevel);
@@ -53,15 +109,18 @@ int GroupOfGroups::getPercentOfPlayers ( int score, int lowerLevel, int higherLe
         return FAILURE; // catch FAILURE in DS func
     }
 
-    int denominator = level_and_number_player_tree->getInfo();
-    if(LBnodeGlobal->getLeft_son()== nullptr)
-    {
-        denominator -= LBnodeGlobal->getLeft_son()->getInfo();
-    }
-    if(HBnodeGlobal->getRight_son()== nullptr)
-    {
-        denominator -= HBnode->getRight_son()->getInfo();
-    }
+
+    int higher_than_HB_G = level_and_number_player_tree->sumInfoOfHighest(level_and_number_player_tree,HBnodeGlobal->getKey()) - HBnodeGlobal->getKey().getNumber();
+    int lower_than_LB_G = level_and_number_player_tree->sumInfoOfLowest(level_and_number_player_tree,LBnodeGlobal->getKey()) - LBnodeGlobal->getKey().getNumber();
+    denominator = level_and_number_player_tree->getInfo() - lower_than_LB_G - higher_than_HB_G;
+//    if(LBnodeGlobal->getLeft_son()!= nullptr)
+//    {
+//        denominator -= LBnodeGlobal->getLeft_son()->getInfo();
+//    }
+//    if(HBnodeGlobal->getRight_son()!= nullptr)
+//    {
+//        denominator -= HBnodeGlobal->getRight_son()->getInfo();
+//    }
 
     if(lowerLevel <=0)
     {
@@ -73,7 +132,7 @@ int GroupOfGroups::getPercentOfPlayers ( int score, int lowerLevel, int higherLe
         denominator += sum;
     }
 
-    *players = nominator/denominator;
+    *players = (nominator/denominator) * 100 ;
     return SUCCESS;
 
 
@@ -159,10 +218,14 @@ void GroupOfGroups::mergeGroupOfGroups(GroupOfGroups* groupOfGroups1 , GroupOfGr
     if(groupOfGroups1->num_of_groups >= groupOfGroups2->num_of_groups)
     {
         mergeGroupOfGroupsHelper(groupOfGroups1,groupOfGroups2);
+        groupOfGroups2->getRoot()->setFather(groupOfGroups1->getRoot());
+        delete groupOfGroups2;
     }
     else
     {
         mergeGroupOfGroupsHelper(groupOfGroups2,groupOfGroups1);
+        groupOfGroups1->getRoot()->setFather(groupOfGroups2->getRoot());
+        delete groupOfGroups1;
     }
 }
 
@@ -380,7 +443,7 @@ GroupOfGroups::~GroupOfGroups()
     level_and_id_player_tree->postOrderAndDestroy(level_and_id_player_tree);
     level_and_number_player_tree->postOrderAndDestroy(level_and_number_player_tree);
 
-    for (int i = 0; i < scale; ++i)
+    for (int i = 0; i < scale + 1; ++i)
     {
         auto current_tree = scaleTreeArray[i];
         scaleTreeArray[i] = nullptr;
@@ -390,4 +453,35 @@ GroupOfGroups::~GroupOfGroups()
     delete [] scaleTreeArray;
 
     delete [] scaleLevel0Array;
+}
+
+
+//*****************************************************************
+//Group
+//*****************************************************************
+
+
+void Group::setFather(Group * newFather)
+{
+    father = newFather;
+}
+
+void Group::setLabel(GroupOfGroups * newLabel)
+{
+    label = newLabel;
+}
+
+Group * Group::getFather()
+{
+    return father;
+}
+
+GroupOfGroups * Group::getLabel()
+{
+    return label;
+}
+
+int Group::getGroupId()
+{
+    return group_id;
 }

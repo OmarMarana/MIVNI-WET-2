@@ -16,13 +16,14 @@ class UnionFind {
         int k;
 
     public:
-        UnionFind(int scale , int k) : scale(scale) , k(k), groups(new Group*[k]) , groupOfGroups(new GroupOfGroups*[k])
+        UnionFind(int scale , int k) : scale(scale) , k(k), groups(new Group*[k+1]) , groupOfGroups(new GroupOfGroups*[k+1])
         {
-            for (int i = 0; i < k; ++i)
+            for (int i = 0; i < k+1; ++i)
             {
                 groups[i] = new Group(i);
-                groupOfGroups[i] = new GroupOfGroups(k,scale);
+                groupOfGroups[i] = new GroupOfGroups(k,scale,i);
                 groups[i]->setLabel(groupOfGroups[i]);
+                groupOfGroups[i]->setRoot(groups[i]);
             }
         }
         ~UnionFind();

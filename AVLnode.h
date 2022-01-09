@@ -93,9 +93,43 @@ public:
     void swapHeightAndBF(std::shared_ptr<AVL_node<T,S>> node_to_delete,std::shared_ptr<AVL_node<T,S>> NextInOrderVal);
     int countNodes(std::shared_ptr<AVL_node<T,S>> root);
     int sumInfoOfHighest(std::shared_ptr<AVL_node<T,S>> root,S key);
-
+    int sumInfoOfLowest(std::shared_ptr<AVL_node<T,S>> root,S key);
 
 };
+
+template <class T, class S>
+int AVL_node<T,S>::sumInfoOfLowest(std::shared_ptr<AVL_node<T,S>> root,S key)
+{
+    int sum = root->info;
+    std::shared_ptr<AVL_node<T,S>> tmp = root;
+    while(tmp != nullptr)
+    {
+        if(tmp->key == key)
+        {
+            if(tmp->right_son != nullptr)
+            {
+                sum -=tmp->right_son->info;
+            }
+            return sum;
+        }
+        if(tmp->key < key)
+        {
+
+            tmp = tmp->right_son;
+        }
+        else
+        {
+            sum -= tmp->key.getNumber();
+            if(tmp->right_son != nullptr)
+            {
+                sum -=tmp->right_son->info;
+            }
+            tmp = tmp->left_son;
+        }
+    }
+    tmp = nullptr;
+    return -1;
+}
 
 
 template <class T, class S>
