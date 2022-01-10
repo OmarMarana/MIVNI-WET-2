@@ -9,8 +9,8 @@
 #include "AVLnode.h"
 #include "LevelAndId.h"
 #include "LevelAndNumber.h"
-#define FAILURE -1
-#define SUCCESS 0
+#define GOG_FAILURE -1
+#define GOG_SUCCESS 0
 
 class GroupOfGroups;
 
@@ -76,6 +76,7 @@ class GroupOfGroups {
         Group* getRoot();
         int getIndex();
         int getNumOfGroups();
+        int getNumOfPlayers();
 
 
 };

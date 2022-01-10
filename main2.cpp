@@ -35,13 +35,13 @@ typedef enum {
     REMOVEPLAYER_CMD = 3,
     INCREASEPLAYERIDLEVEL_CMD = 4,
     CHANGEPLAYERIDSCORE_CMD = 5,
-    GETNUMOFPLAYERSWITHSCOREINBOUNDS_CMD = 6,
+    GETPERCENTOFPLAYERSWITHSCOREINBOUNDS_CMD = 6,
     AVERAGEHIGHESTPLAYERLEVELBYGROUP_CMD = 7,
     GETPLAYERSBOUND_CMD = 8,
     QUIT_CMD = 9
 } commandType;
 
-static const int numActions = 9;
+static const int numActions = 10;
 static const char *commandStr[] = {
         "Init",
         "MergeGroups",
@@ -49,7 +49,7 @@ static const char *commandStr[] = {
         "RemovePlayer",
         "IncreasePlayerIDLevel",
         "ChangePlayerIDScore",
-        "GetNumOfPlayersWithScoreInBounds",
+        "GetPercentOfPlayersWithScoreInBounds",
         "AverageHighestPlayerLevelByGroup",
         "GetPlayersBound",
         "Quit" };
@@ -169,15 +169,15 @@ static errorType parser(const char* const command) {
         case (CHANGEPLAYERIDSCORE_CMD):
             rtn_val = OnChangePlayerIDScore(DS, command_args);
             break;
-        case (GETNUMOFPLAYERSWITHSCOREINBOUNDS_CMD):
+        case (GETPERCENTOFPLAYERSWITHSCOREINBOUNDS_CMD):
             rtn_val = OnGetPercentOfPlayersWithScoreInBounds(DS, command_args);
             break;
         case (AVERAGEHIGHESTPLAYERLEVELBYGROUP_CMD):
             rtn_val = OnAverageHighestPlayerLevelByGroup(DS, command_args);
             break;
-        case (GETPLAYERSBOUND_CMD):
-            rtn_val = OnGetPlayersBound(&DS, command_args);
-            break;
+//        case (GETPLAYERSBOUND_CMD):
+//            rtn_val = OnGetPlayersBound(DS, command_args);
+//            break;
         case (QUIT_CMD):
             rtn_val = OnQuit(&DS, command_args);
             break;
@@ -322,7 +322,7 @@ static errorType OnGetPercentOfPlayersWithScoreInBounds(void* DS, const char* co
     int higherLevel;
     ValidateRead(sscanf(command, "%d %d %d %d", &groupID, &score, &lowerLevel, &higherLevel), 4,
                  "GetPercentOfPlayersWithScoreInBounds failed.\n");
-    double players;
+    double players = 0.0;
     StatusType res = GetPercentOfPlayersWithScoreInBounds(DS, groupID, score, lowerLevel, higherLevel, &players);
 
     if (res != SUCCESS) {
@@ -343,7 +343,7 @@ static errorType OnAverageHighestPlayerLevelByGroup(void* DS, const char* const 
     int m;
     ValidateRead(sscanf(command, "%d %d", &groupID, &m), 2,
                  "AverageHighestPlayerLevelByGroup failed.\n");
-    double level;
+    double level = 0.0;
     StatusType res = AverageHighestPlayerLevelByGroup(DS, groupID, m, &level);
 
     if (res != SUCCESS) {
@@ -359,25 +359,25 @@ static errorType OnAverageHighestPlayerLevelByGroup(void* DS, const char* const 
 /* OnGetPlayersBound                                                        */
 /***************************************************************************/
 
-static errorType OnGetPlayersBound(void* DS, const char* const command) {
-    int groupID;
-    int score;
-    int m;
-    ValidateRead(sscanf(command, "%d %d %d", &groupID, &score, &m), 3,
-                 "GetPlayersBound failed.\n");
-    int lowerBoundPlayers;
-    int higherBoundPlayers;
-    StatusType res = GetPlayersBound(DS, groupID, score, m, &lowerBoundPlayers, &higherBoundPlayers);
-
-    if (res != SUCCESS) {
-        printf("GetPlayersBound: %s\n", ReturnValToStr(res));
-        return error_free;
-    }
-
-    printf("GetPlayersBound: %d %d\n", lowerBoundPlayers, higherBoundPlayers);
-
-    return error_free;
-}
+//static errorType OnGetPlayersBound(void* DS, const char* const command) {
+//    int groupID;
+//    int score;
+//    int m;
+//    ValidateRead(sscanf(command, "%d %d %d", &groupID, &score, &m), 3,
+//                 "GetPlayersBound failed.\n");
+//    int lowerBoundPlayers = 0;
+//    int higherBoundPlayers = 0;
+//    StatusType res = GetPlayersBound(DS, groupID, score, m, &lowerBoundPlayers, &higherBoundPlayers);
+//
+//    if (res != SUCCESS) {
+//        printf("GetPlayersBound: %s\n", ReturnValToStr(res));
+//        return error_free;
+//    }
+//
+//    printf("GetPlayersBound: %d %d\n", lowerBoundPlayers, higherBoundPlayers);
+//
+//    return error_free;
+//}
 
 /***************************************************************************/
 /* OnQuit                                                                  */

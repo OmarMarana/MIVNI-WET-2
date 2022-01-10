@@ -18,6 +18,6 @@ set(CMAKE_CPP_FLAGS ${MTM_FLAGS_DEBUG})
 
 
 # Add the names of your source files here
-set(CPP_FILES   main.cpp LevelAndId.cpp LevelAndNumber.cpp GroupOfGroups.cpp Group.cpp UnionFind.cpp HashTable.cpp Player.cpp LinkedList.cpp)
+set(CPP_FILES   main2.cpp LevelAndId.cpp LevelAndNumber.cpp GroupOfGroups.cpp Group.cpp UnionFind.cpp HashTable.cpp Player.cpp LinkedList.cpp PlayersManager.cpp  library2.cpp)
 
 add_executable(mivni2 ${CPP_FILES})
