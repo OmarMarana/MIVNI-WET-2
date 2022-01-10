@@ -10,14 +10,14 @@ PlayersManager::~PlayersManager()
     level_and_id_player_tree->postOrderAndDestroy(level_and_id_player_tree);
     level_and_number_player_tree->postOrderAndDestroy(level_and_number_player_tree);
 
-    for (int i = 0; i < scale + 1; ++i)
-    {
-        auto current_tree = scaleTreeArray[i];
-        scaleTreeArray[i] = nullptr;
-        current_tree->postOrderAndDestroy(current_tree);
-        current_tree = nullptr;
-    }
-    delete [] scaleTreeArray;
+//    for (int i = 0; i < scale + 1; ++i)
+//    {
+//        auto current_tree = scaleTreeArray[i];
+//        scaleTreeArray[i] = nullptr;
+//        current_tree->postOrderAndDestroy(current_tree);
+//        current_tree = nullptr;
+//    }
+    delete [] scalePositiveLevelArray;
 
     delete [] scaleLevel0Array;
 }
@@ -89,6 +89,7 @@ StatusType PlayersManager::PMremovePlayer(int PlayerID)
         Player player = node->getInfo();
         int level = player.getLevel();
         int GroupID = player.getGroupId();
+        int score = player.getScore();
         playersHT.HashTableDelete(PlayerID);
 
         if(level != 0)
@@ -109,17 +110,18 @@ StatusType PlayersManager::PMremovePlayer(int PlayerID)
                 level_and_number_player_tree = level_and_number_player_tree->treeBalance(level_and_number_player_tree->find(level_and_number_player_tree,ln1));
             }
 
-            auto lnNode = scaleTreeArray[player.getScore()]->find(scaleTreeArray[player.getScore()],ln);
-            old_number = lnNode->getKey().getNumber();
-            scaleTreeArray[player.getScore()] = scaleTreeArray[player.getScore()]->deleteNode(scaleTreeArray[player.getScore()],ln);
-            if(  old_number != 1)
-            {
-                LevelAndNumber ln2(old_level , old_number-1);
-                scaleTreeArray[player.getScore()] = scaleTreeArray[player.getScore()]->insert(scaleTreeArray[player.getScore()],ln2,0);
-                scaleTreeArray[player.getScore()] = scaleTreeArray[player.getScore()]->treeBalance(scaleTreeArray[player.getScore()]->find(
-                        scaleTreeArray[player.getScore()],ln2));
-            }
+//            auto lnNode = scaleTreeArray[player.getScore()]->find(scaleTreeArray[player.getScore()],ln);
+//            old_number = lnNode->getKey().getNumber();
+//            scaleTreeArray[player.getScore()] = scaleTreeArray[player.getScore()]->deleteNode(scaleTreeArray[player.getScore()],ln);
+//            if(  old_number != 1)
+//            {
+//                LevelAndNumber ln2(old_level , old_number-1);
+//                scaleTreeArray[player.getScore()] = scaleTreeArray[player.getScore()]->insert(scaleTreeArray[player.getScore()],ln2,0);
+//                scaleTreeArray[player.getScore()] = scaleTreeArray[player.getScore()]->treeBalance(scaleTreeArray[player.getScore()]->find(
+//                        scaleTreeArray[player.getScore()],ln2));
+//            }
 
+            scalePositiveLevelArray[score]--;
             num_of_players_with_positive_level--;
         }
 
@@ -187,22 +189,23 @@ StatusType PlayersManager::PMincreasePlayerIDLevel(int PlayerID, int LevelIncrea
                 level_and_number_player_tree = level_and_number_player_tree->treeBalance(level_and_number_player_tree->find(level_and_number_player_tree,ln1));
             }
 
-            LevelAndNumber ln2(old_level + LevelIncrease,1);
-            auto lnNode2 = scaleTreeArray[score]->find(scaleTreeArray[score],ln2);
-            if(lnNode2 == nullptr)
-            {
-                scaleTreeArray[score] =  scaleTreeArray[score]->insert( scaleTreeArray[score],ln2,0);
-                scaleTreeArray[score] =  scaleTreeArray[score]->treeBalance( scaleTreeArray[score]->find( scaleTreeArray[score],ln2));
-            }
-            else
-            {
-                int old_number2 = lnNode2->getKey().getNumber();
-                scaleTreeArray[score] =  scaleTreeArray[score]->deleteNode( scaleTreeArray[score], ln2);
-                LevelAndNumber ln3(old_level + LevelIncrease, old_number2+1);
-                scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln3,0);
-                scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln3));
-            }
+//            LevelAndNumber ln2(old_level + LevelIncrease,1);
+//            auto lnNode2 = scaleTreeArray[score]->find(scaleTreeArray[score],ln2);
+//            if(lnNode2 == nullptr)
+//            {
+//                scaleTreeArray[score] =  scaleTreeArray[score]->insert( scaleTreeArray[score],ln2,0);
+//                scaleTreeArray[score] =  scaleTreeArray[score]->treeBalance( scaleTreeArray[score]->find( scaleTreeArray[score],ln2));
+//            }
+//            else
+//            {
+//                int old_number2 = lnNode2->getKey().getNumber();
+//                scaleTreeArray[score] =  scaleTreeArray[score]->deleteNode( scaleTreeArray[score], ln2);
+//                LevelAndNumber ln3(old_level + LevelIncrease, old_number2+1);
+//                scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln3,0);
+//                scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln3));
+//            }
             scaleLevel0Array[score]--;
+            scalePositiveLevelArray[score]++;
             num_of_players_with_positive_level++;
         }
         else
@@ -238,27 +241,30 @@ StatusType PlayersManager::PMincreasePlayerIDLevel(int PlayerID, int LevelIncrea
             level_and_number_player_tree = level_and_number_player_tree->treeBalance(level_and_number_player_tree->find(level_and_number_player_tree,ln4));
 
 
-            LevelAndNumber ln3(old_level,1);
-            auto lnNode1 = scaleTreeArray[score]->find(scaleTreeArray[score],ln3);
-            int old_number1 = lnNode1->getKey().getNumber();
+//            LevelAndNumber ln3(old_level,1);
+//            auto lnNode1 = scaleTreeArray[score]->find(scaleTreeArray[score],ln3);
+//            int old_number1 = lnNode1->getKey().getNumber();
+//
+//            scaleTreeArray[score] = scaleTreeArray[score]->deleteNode(scaleTreeArray[score],ln3);
+//            if(old_number1  != 1)
+//            {
+////            int old_number = lnNode->getKey().getNumber();
+//                LevelAndNumber ln1(old_level , old_number-1);
+//                scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln1,0);
+//                scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln1));
+//            }
+//
+////        LevelAndNumber ln4(old_level+LevelIncrease, old_number);
+//            LevelAndNumber ln5(old_level + LevelIncrease, 1);
+//            auto lnNode3 = scaleTreeArray[score] ->find(scaleTreeArray[score] ,ln5);
+//            int old_number3 = lnNode3->getKey().getNumber();
+//            ln5.setNumber(old_number3+1);
+//            scaleTreeArray[score] = scaleTreeArray[score]->deleteNode(scaleTreeArray[score], ln5);
+//            scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln5,0);
+//            scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln5));
 
-            scaleTreeArray[score] = scaleTreeArray[score]->deleteNode(scaleTreeArray[score],ln3);
-            if(old_number1  != 1)
-            {
-//            int old_number = lnNode->getKey().getNumber();
-                LevelAndNumber ln1(old_level , old_number-1);
-                scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln1,0);
-                scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln1));
-            }
 
-//        LevelAndNumber ln4(old_level+LevelIncrease, old_number);
-            LevelAndNumber ln5(old_level + LevelIncrease, 1);
-            auto lnNode3 = scaleTreeArray[score] ->find(scaleTreeArray[score] ,ln5);
-            int old_number3 = lnNode3->getKey().getNumber();
-            ln5.setNumber(old_number3+1);
-            scaleTreeArray[score] = scaleTreeArray[score]->deleteNode(scaleTreeArray[score], ln5);
-            scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln5,0);
-            scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln5));
+
         }
 
         UF.Find(GroupID)->increaseLevel(PlayerID,LevelIncrease);
@@ -298,34 +304,36 @@ StatusType PlayersManager::PMchangePlayerIDScore(int PlayerID, int NewScore)
         else
         {
 
-            LevelAndNumber ln(level,0);
-            auto lnNode= scaleTreeArray[old_score]->find(scaleTreeArray[old_score],ln);
-            int old_number  = lnNode->getKey().getNumber();
-            scaleTreeArray[old_score] =scaleTreeArray[old_score]->deleteNode(scaleTreeArray[old_score] ,ln);
-            if(old_number != 1)
-            {
-                LevelAndNumber ln1(level,old_number-1);
-                scaleTreeArray[old_score] = scaleTreeArray[old_score]->insert(scaleTreeArray[old_score],ln1,0);
-                scaleTreeArray[old_score] = scaleTreeArray[old_score]->treeBalance(scaleTreeArray[old_score]->find(scaleTreeArray[old_score],ln1));
-            }
+//            LevelAndNumber ln(level,0);
+//            auto lnNode= scaleTreeArray[old_score]->find(scaleTreeArray[old_score],ln);
+//            int old_number  = lnNode->getKey().getNumber();
+//            scaleTreeArray[old_score] =scaleTreeArray[old_score]->deleteNode(scaleTreeArray[old_score] ,ln);
+//            if(old_number != 1)
+//            {
+//                LevelAndNumber ln1(level,old_number-1);
+//                scaleTreeArray[old_score] = scaleTreeArray[old_score]->insert(scaleTreeArray[old_score],ln1,0);
+//                scaleTreeArray[old_score] = scaleTreeArray[old_score]->treeBalance(scaleTreeArray[old_score]->find(scaleTreeArray[old_score],ln1));
+//            }
+//
+//            auto lnNode1= scaleTreeArray[NewScore]->find(scaleTreeArray[NewScore],ln);
+//            if(lnNode1 == nullptr)
+//            {
+//                LevelAndNumber ln2(level,1);
+//                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->insert(scaleTreeArray[NewScore],ln2,0);
+//                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->treeBalance(scaleTreeArray[NewScore]->find(scaleTreeArray[NewScore],ln2));
+//            }
+//            else
+//            {
+//                int old_number1  = lnNode1->getKey().getNumber();
+//                scaleTreeArray[NewScore] =scaleTreeArray[NewScore]->deleteNode(scaleTreeArray[NewScore] ,ln);
+//
+//                LevelAndNumber ln2(level,old_number1+1);
+//                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->insert(scaleTreeArray[NewScore],ln2,0);
+//                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->treeBalance(scaleTreeArray[NewScore]->find(scaleTreeArray[NewScore],ln2));
+//            }
 
-            auto lnNode1= scaleTreeArray[NewScore]->find(scaleTreeArray[NewScore],ln);
-            if(lnNode1 == nullptr)
-            {
-                LevelAndNumber ln2(level,1);
-                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->insert(scaleTreeArray[NewScore],ln2,0);
-                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->treeBalance(scaleTreeArray[NewScore]->find(scaleTreeArray[NewScore],ln2));
-            }
-            else
-            {
-                int old_number1  = lnNode1->getKey().getNumber();
-                scaleTreeArray[NewScore] =scaleTreeArray[NewScore]->deleteNode(scaleTreeArray[NewScore] ,ln);
-
-                LevelAndNumber ln2(level,old_number1+1);
-                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->insert(scaleTreeArray[NewScore],ln2,0);
-                scaleTreeArray[NewScore] = scaleTreeArray[NewScore]->treeBalance(scaleTreeArray[NewScore]->find(scaleTreeArray[NewScore],ln2));
-            }
-
+            scalePositiveLevelArray[old_score]--;
+            scalePositiveLevelArray[NewScore]++;
         }
 
         UF.Find(GroupID)->changeScore(PlayerID,NewScore);
@@ -348,12 +356,12 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
     {
         if(GroupID == 0)
         {
-            auto LBnode = scaleTreeArray[score]->findClosestNodeFromAbove(scaleTreeArray[score],lowerLevel);
-            auto HBnode = scaleTreeArray[score]->findClosestNodeFromBeneath(scaleTreeArray[score],higherLevel);
+//            auto LBnode = scaleTreeArray[score]->findClosestNodeFromAbove(scaleTreeArray[score],lowerLevel);
+//            auto HBnode = scaleTreeArray[score]->findClosestNodeFromBeneath(scaleTreeArray[score],higherLevel);
             double denominator =0;
             double nominator =0;
 
-            if(scaleTreeArray[score] == nullptr)
+            if(scalePositiveLevelArray[score] == 0)
             {
                 if(lowerLevel <= 0)
                 {
@@ -375,15 +383,21 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
             }
             else
             {
-                if(HBnode== nullptr || LBnode== nullptr || HBnode->getKey().getLevel() < LBnode->getKey().getLevel())
-                {
-                    return FAILURE; // catch FAILURE in DS func
-                }
-
-                int higher_than_HB = scaleTreeArray[score]->sumInfoOfHighest(scaleTreeArray[score],HBnode->getKey()) - HBnode->getKey().getNumber();
-                int lower_than_LB = scaleTreeArray[score]->sumInfoOfLowest(scaleTreeArray[score],LBnode->getKey()) - LBnode->getKey().getNumber();
-                nominator = scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
+                nominator = scalePositiveLevelArray[score];
             }
+
+
+//            else
+//            {
+//                if(HBnode== nullptr || LBnode== nullptr || HBnode->getKey().getLevel() < LBnode->getKey().getLevel())
+//                {
+//                    return FAILURE; // catch FAILURE in DS func
+//                }
+//
+//                int higher_than_HB = scaleTreeArray[score]->sumInfoOfHighest(scaleTreeArray[score],HBnode->getKey()) - HBnode->getKey().getNumber();
+//                int lower_than_LB = scaleTreeArray[score]->sumInfoOfLowest(scaleTreeArray[score],LBnode->getKey()) - LBnode->getKey().getNumber();
+//                nominator = scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
+//            }
 
             auto LBnodeGlobal = level_and_number_player_tree->findClosestNodeFromAbove(level_and_number_player_tree,lowerLevel);
             auto HBnodeGlobal = level_and_number_player_tree->findClosestNodeFromBeneath(level_and_number_player_tree,higherLevel);

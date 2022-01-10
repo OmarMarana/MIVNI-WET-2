@@ -40,7 +40,8 @@ class GroupOfGroups {
         HashTable<Player,int> playersHT;
         std::shared_ptr<AVL_node<int,LevelAndId>> level_and_id_player_tree; // only for level>0
         std::shared_ptr<AVL_node<int,LevelAndNumber>> level_and_number_player_tree;  // only for level>0
-        std::shared_ptr<AVL_node<int,LevelAndNumber>>* scaleTreeArray; // only for level>0
+//        std::shared_ptr<AVL_node<int,LevelAndNumber>>* scaleTreeArray; // only for level>0
+        int* scalePositiveLevelArray;
         int* scaleLevel0Array;
         int num_of_players_with_positive_level;
         int num_of_players;
@@ -51,17 +52,17 @@ class GroupOfGroups {
 
     public:
         GroupOfGroups(int k, int scale, int index) : scale(scale) ,playersHT(k), level_and_id_player_tree(nullptr), level_and_number_player_tree(
-                nullptr),scaleTreeArray(new std::shared_ptr<AVL_node<int,LevelAndNumber>>[scale+1]) ,scaleLevel0Array(new int[scale+1]),
+                nullptr), scalePositiveLevelArray(new int[scale+1]),scaleLevel0Array(new int[scale+1]),
                 num_of_players_with_positive_level(0), num_of_players(0) , num_of_groups(1), root(nullptr), index(index)
                 {
                     for (int i = 0; i < scale+1; ++i)
                     {
-                        scaleTreeArray[i] = nullptr;
                         scaleLevel0Array[i] =0;
+                        scalePositiveLevelArray[i] =0;
                     }
         }
         ~GroupOfGroups();
-        void insetToScaleTreeArray(LevelAndNumber ln, int score);
+//        void insetToScaleTreeArray(LevelAndNumber ln, int score);
         void removePlayerID(int player_id);
         void addPlayerID(int player_id, int group_id, int score);
         void increaseLevel(int player_id , int delta);

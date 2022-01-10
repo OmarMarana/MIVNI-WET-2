@@ -14,7 +14,8 @@ class PlayersManager {
     std::shared_ptr<AVL_node<int,LevelAndId>> level_and_id_player_tree; // only for level>0
     UnionFind UF;
     HashTable<Player,int> playersHT;
-    std::shared_ptr<AVL_node<int,LevelAndNumber>>* scaleTreeArray; // only for level>0
+//    std::shared_ptr<AVL_node<int,LevelAndNumber>>* scaleTreeArray; // only for level>0
+    int* scalePositiveLevelArray;
     std::shared_ptr<AVL_node<int,LevelAndNumber>> level_and_number_player_tree;  // only for level>0
     int* scaleLevel0Array;
     int num_of_players_with_positive_level;
@@ -24,12 +25,12 @@ class PlayersManager {
 
 public:
     PlayersManager(int scale, int k) : level_and_id_player_tree(nullptr), UF(scale,k), playersHT(k),
-    scaleTreeArray(new std::shared_ptr<AVL_node<int,LevelAndNumber>>[scale+1]) , level_and_number_player_tree(nullptr),
+    scalePositiveLevelArray(new int[scale+1]) , level_and_number_player_tree(nullptr),
     scaleLevel0Array(new int[scale + 1]), num_of_players_with_positive_level(0), num_of_players(0), scale(scale), k(k)
     {
         for (int i = 0; i < scale+1; ++i)
         {
-            scaleTreeArray[i] = nullptr;
+            scalePositiveLevelArray[i] =0;
             scaleLevel0Array[i] =0;
         }
     }
