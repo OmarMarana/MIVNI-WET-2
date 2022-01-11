@@ -450,16 +450,16 @@ StatusType PlayersManager::PMaverageHighestPlayerLevelByGroup( int GroupID, int 
                 return  FAILURE;
             }
             double sum =0;
-
+            double m_double = (double)m;
             if(m <= num_of_players_with_positive_level)
             {
                 auto LInode = level_and_id_player_tree->select(level_and_id_player_tree,num_of_players_with_positive_level-m+1);
                 sum = level_and_id_player_tree->sumInfoOfHighest(level_and_id_player_tree,LInode->getKey());
-                *avgLevel = sum/m;
+                *avgLevel = sum/m; // maybe change to double
             }
             else
             {
-                *avgLevel = level_and_number_player_tree->getInfo()/m;
+                *avgLevel = level_and_number_player_tree->getInfo()/m_double;
             }
         }
         else
