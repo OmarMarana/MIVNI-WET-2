@@ -163,8 +163,12 @@ StatusType PlayersManager::PMincreasePlayerIDLevel(int PlayerID, int LevelIncrea
         int old_level = player.getLevel();
         int GroupID = player.getGroupId();
         int score = player.getScore();
-        node->getInfo().setLevel(node->getInfo().getLevel() + LevelIncrease);
-
+//        node->getInfo().setLevel(node->getInfo().getLevel() + LevelIncrease);
+//        int GroupID = player.getGroupId();
+//    node->getInfo().setLevel(node->getInfo().getLevel() + delta);
+        Player player1(PlayerID,GroupID,score);
+        player1.setLevel(old_level + LevelIncrease);
+        node->setInfo(player1);
         if(old_level == 0)
         {
             LevelAndId li( old_level + LevelIncrease, PlayerID);
@@ -402,7 +406,7 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
             {
                 nominator += scaleLevel0Array[score];
                 int sum=0;
-                for (int i = 0; i < scale; ++i) {
+                for (int i = 0; i < scale + 1; ++i) {
                     sum+= scaleLevel0Array[i];
                 }
                 denominator += sum;

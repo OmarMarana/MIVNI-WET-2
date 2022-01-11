@@ -16,6 +16,7 @@ class ListNode{
     ListNode* prev;
     S getKey();
     T getInfo();
+    void setInfo(T new_info);
 
         ListNode(T info, S key) : info(info), key(key), next(nullptr), prev(nullptr) {};
 };
@@ -53,6 +54,12 @@ void LinkedList<T,S>::clearList()
         delete tmp;
     }
 
+}
+
+template<class T, class S>
+void ListNode<T,S>::setInfo(T new_info)
+{
+    info = new_info;
 }
 
 template<class T, class S>

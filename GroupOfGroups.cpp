@@ -131,7 +131,7 @@ int GroupOfGroups::getPercentOfPlayers ( int score, int lowerLevel, int higherLe
     {
         nominator += scaleLevel0Array[score];
         int sum=0;
-        for (int i = 0; i < scale; ++i) {
+        for (int i = 0; i < scale + 1; ++i) {
             sum+= scaleLevel0Array[i];
         }
         denominator += sum;
@@ -188,7 +188,7 @@ void GroupOfGroups::mergeGroupOfGroupsHelper(GroupOfGroups* groupOfGroups_dest ,
         delete [] mergedLevelSumArray1;
 
 
-        for (int i = 0; i < scale; ++i)
+        for (int i = 0; i < scale + 1; ++i)
         {
             m = groupOfGroups_dest->scaleTreeArray[i]->countNodes(groupOfGroups_dest->scaleTreeArray[i]);
             n = groupOfGroups_src->scaleTreeArray[i]->countNodes(groupOfGroups_src->scaleTreeArray[i]);
@@ -206,7 +206,7 @@ void GroupOfGroups::mergeGroupOfGroupsHelper(GroupOfGroups* groupOfGroups_dest ,
 
 
 
-    for (int i = 0; i < scale; ++i)
+    for (int i = 0; i < scale + 1; ++i)
     {
         groupOfGroups_dest->scaleLevel0Array[i] +=groupOfGroups_src->scaleLevel0Array[i];
     }
@@ -290,7 +290,11 @@ void GroupOfGroups::increaseLevel(int player_id , int delta)
     Player player = node->getInfo();
     int old_level = player.getLevel();
     int score = player.getScore();
-    node->getInfo().setLevel(node->getInfo().getLevel() + delta);
+    int GroupID = player.getGroupId();
+//    node->getInfo().setLevel(node->getInfo().getLevel() + delta);
+    Player player1(player_id,GroupID,score);
+    player1.setLevel(old_level + delta);
+    node->setInfo(player1);
 
     if(old_level == 0)
     {
