@@ -459,6 +459,12 @@ StatusType PlayersManager::PMaverageHighestPlayerLevelByGroup( int GroupID, int 
             }
             else
             {
+                if(level_and_number_player_tree == nullptr)
+                {
+                    *avgLevel = 0;
+                    return  SUCCESS;
+                }
+
                 *avgLevel = level_and_number_player_tree->getInfo()/m_double;
             }
         }

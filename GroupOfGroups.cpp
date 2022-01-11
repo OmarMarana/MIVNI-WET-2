@@ -45,6 +45,12 @@ void GroupOfGroups::averageHighestPlayerLevelByGroup(int m, double * avgLevel)
     }
     else
     {
+        if(level_and_number_player_tree == nullptr)
+        {
+            *avgLevel = 0;
+            return;
+        }
+
         *avgLevel = level_and_id_player_tree->getInfo()/m_double;
         return;
     }

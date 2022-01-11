@@ -1,18 +1,21 @@
-Init 4 6
-AddPlayer 10 1 2
-AddPlayer 11 2 3
-AddPlayer 9 0 2
-AddPlayer 7 1 5
-AddPlayer 12 1 4
-AddPlayer 20 1 5
-IncreasePlayerIDLevel 10 2
-IncreasePlayerIDLevel 12 3
-ChangePlayerIDScore 10 3
-GetPercentOfPlayersWithScoreInBounds 0 3 1 5
-MergeGroups 1 2
-RemovePlayer 20
-AverageHighestPlayerLevelByGroup 2 3
-Quit
-
-
-
+Init 80 172
+AddPlayer 903464364 7 9
+AddPlayer 1085769560 29 21
+AddPlayer 490733835 53 75
+AddPlayer 1846153707 23 85
+AddPlayer 970903357 74 -3
+AddPlayer 1085769560 49 156
+RemovePlayer 1085769560
+ChangePlayerIDScore 490733835 158
+MergeGroups -2 22
+AddPlayer 1046923864 20 155
+AddPlayer 1466089782 25 51
+GetPercentOfPlayersWithScoreInBounds 0 115 0 0
+ChangePlayerIDScore 215021317 41
+AddPlayer 1158375578 72 69
+AddPlayer 1766913640 94962591 89
+AddPlayer 636472419 38 111
+AddPlayer 1466089782 46 22
+AverageHighestPlayerLevelByGroup 976753272 1
+ChangePlayerIDScore 1158375578 58
+AverageHighestPlayerLevelByGroup 20 1
