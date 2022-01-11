@@ -465,7 +465,7 @@ S * AVL_node<T,S>::merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T 
         }
         else if(arr1Key[i] == arr2Key[j]) // li shouldnt enter here
         {
-            mergedKeyArr[k].setNumber(arr1Key[i].getNumber() + arr2Key[i].getNumber());
+            mergedKeyArr[k].setNumber(arr1Key[i].getNumber() + arr2Key[j].getNumber());
             mergedInfoArr[k] = arr1Info[i];
         }
         else

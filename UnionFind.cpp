@@ -10,6 +10,11 @@ void UnionFind::Union(int group_id1, int group_id2)
     auto group_of_groups1 = Find(group_id1);
     auto group_of_groups2 = Find(group_id2);
 
+    if(group_of_groups1 == group_of_groups2)
+    {
+        return;
+    }
+
     int gog1_index = group_of_groups1->getIndex();
     int gog2_index =group_of_groups2->getIndex();
     int num_of_groups1 = group_of_groups1->getNumOfGroups();
