@@ -35,7 +35,7 @@ Group* GroupOfGroups::getRoot()
 void GroupOfGroups::averageHighestPlayerLevelByGroup(int m, double * avgLevel)
 {
     double sum =0;
-
+    double m_double = (double)m;
     if(m <= num_of_players_with_positive_level)
     {
         auto LInode = level_and_id_player_tree->select(level_and_id_player_tree,num_of_players_with_positive_level-m+1);
@@ -45,7 +45,7 @@ void GroupOfGroups::averageHighestPlayerLevelByGroup(int m, double * avgLevel)
     }
     else
     {
-        *avgLevel = level_and_number_player_tree->getInfo()/m;
+        *avgLevel = level_and_id_player_tree->getInfo()/m_double;
         return;
     }
 
