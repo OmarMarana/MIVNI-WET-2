@@ -80,7 +80,7 @@ public:
     void reverseInOrderNumTimes(std::shared_ptr<AVL_node<T,S>> avlNode, int Players[], int *numOfPlayers,int count);
     void InOrderNumTimes(std::shared_ptr<AVL_node<T,S>> avlNode, int Players[], int *numOfPlayers,int count);
     void storeInorder(std::shared_ptr<AVL_node<T,S>> avlNode, T inorderInfoArr[], S inorderKeyArr[], int *index_ptr);
-    S * merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T mergedInfoArr[],int m, int n);
+    S * merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T mergedInfoArr[],int m, int n, int* duplicate_counter);
     std::shared_ptr<AVL_node<T,S>> sortedArrayToAVLtree(T infoArr[], S keyArr[],int start, int end,std::shared_ptr<AVL_node<T,S>> father);
     std::shared_ptr<AVL_node<T,S>> mergeAvlTrees(std::shared_ptr<AVL_node<T,S>> root1, std::shared_ptr<AVL_node<T,S>> root2,
                                                  T mergedInfoArr[] ,int m, int n);
@@ -182,26 +182,16 @@ int AVL_node<T,S>::countNodes(std::shared_ptr<AVL_node<T,S>> root)
 template <class T, class S>
 S * AVL_node<T,S>::cleanArray(T infoArr[],S keyArr[], int *counter,int size, T ** InfoArrPtr)
 {
-    bool trash_found = false;
-    for(int i = 0; i< size; i++)
-    {
-        if(infoArr[i] == -1)
-        {
-            trash_found = true;
-            *counter = i+1;
-            break;
-        }
-    }
-    if(trash_found== false)
+    if(*counter == 0)
     {
         *InfoArrPtr = infoArr;
         return keyArr;
     }
     else
     {
-        S *cleankeys = new S[*counter];
-        T *cleanInfo = new T[*counter];
-        for(int i = 0; i< *counter; i++)
+        S *cleankeys = new S[size - *counter];
+        T *cleanInfo = new T[size - *counter];
+        for(int i = 0; i< size -*counter; i++)
         {
             cleankeys[i] = keyArr[i];
             cleanInfo[i] = infoArr[i];
@@ -391,13 +381,14 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::mergeAvlTrees(std::shared_ptr<AVL_
     int j = 0;
     storeInorder(root2, arr2Info,arr2keys, &j);
 
-    resetInfoArray(mergedInfoArr, m+n);
-    S *mergedkeyArr = merge(arr1Info,arr1keys, arr2Info, arr2keys,mergedInfoArr, m, n);
-    int counter  = m+n;
+//    resetInfoArray(mergedInfoArr, m+n);
+    int duplicate_counter= 0;
+    S *mergedkeyArr = merge(arr1Info,arr1keys, arr2Info, arr2keys,mergedInfoArr, m, n,&duplicate_counter);
+//    int counter  = m+n;
     T ** clean_mergedInfoArr_ptr = &mergedInfoArr;
-    S *clean_mergedkeyArr = cleanArray(mergedInfoArr,mergedkeyArr,&counter,m+n,clean_mergedInfoArr_ptr);
+    S *clean_mergedkeyArr = cleanArray(mergedInfoArr,mergedkeyArr,&duplicate_counter,m+n,clean_mergedInfoArr_ptr);
 
-    std::shared_ptr<AVL_node<T,S>> mergedTrees = sortedArrayToAVLtree (*clean_mergedInfoArr_ptr,clean_mergedkeyArr, 0, counter - 1, nullptr);
+    std::shared_ptr<AVL_node<T,S>> mergedTrees = sortedArrayToAVLtree (*clean_mergedInfoArr_ptr,clean_mergedkeyArr, 0, m+n -duplicate_counter -1, nullptr);
 
     delete [] arr1keys;
     delete [] arr1Info;
@@ -405,7 +396,7 @@ std::shared_ptr<AVL_node<T,S>> AVL_node<T,S>::mergeAvlTrees(std::shared_ptr<AVL_
     delete [] arr2Info;
     delete [] mergedkeyArr;
 
-    if(counter != m+n)
+    if(duplicate_counter != 0)
     {
         delete [] clean_mergedkeyArr;
         delete [] *clean_mergedInfoArr_ptr;
@@ -450,7 +441,7 @@ void AVL_node<T,S>::storeInorder(std::shared_ptr<AVL_node<T,S>> avlNode, T inord
 }
 
 template <class T, class S>
-S * AVL_node<T,S>::merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T mergedInfoArr[],int m, int n)
+S * AVL_node<T,S>::merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T mergedInfoArr[],int m, int n, int* duplicate_counter)
 {
     S *mergedKeyArr = new S[m + n];
     int i = 0, j = 0, k = 0;
@@ -465,8 +456,12 @@ S * AVL_node<T,S>::merge(T arr1Info[], S arr1Key[],T arr2Info[], S arr2Key[], T 
         }
         else if(arr1Key[i] == arr2Key[j]) // li shouldnt enter here
         {
+            mergedKeyArr[k] = arr1Key[i];
             mergedKeyArr[k].setNumber(arr1Key[i].getNumber() + arr2Key[j].getNumber());
-            mergedInfoArr[k] = arr1Info[i];
+//            mergedInfoArr[k] = arr1Info[i];
+            (*duplicate_counter)++;
+            i++;
+            j++;
         }
         else
         {
