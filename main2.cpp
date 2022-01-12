@@ -135,7 +135,7 @@ static errorType OnIncreasePlayerIDLevel(void* DS, const char* const command);
 static errorType OnChangePlayerIDScore(void* DS, const char* const command);
 static errorType OnGetPercentOfPlayersWithScoreInBounds(void* DS, const char* const command);
 static errorType OnAverageHighestPlayerLevelByGroup(void* DS, const char* const command);
-static errorType OnGetPlayersBound(void* DS, const char* const command);
+//static errorType OnGetPlayersBound(void* DS, const char* const command);
 static errorType OnQuit(void** DS, const char* const command);
 
 /***************************************************************************/

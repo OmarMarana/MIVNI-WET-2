@@ -239,14 +239,14 @@ void GroupOfGroups::mergeGroupOfGroups(GroupOfGroups* groupOfGroups1 , GroupOfGr
         mergeGroupOfGroupsHelper(groupOfGroups1,groupOfGroups2);
         groupOfGroups2->getRoot()->setFather(groupOfGroups1->getRoot());
         delete groupOfGroups2;
-        groupOfGroups2 == nullptr;
+        groupOfGroups2 = nullptr;
     }
     else
     {
         mergeGroupOfGroupsHelper(groupOfGroups2,groupOfGroups1);
         groupOfGroups1->getRoot()->setFather(groupOfGroups2->getRoot());
         delete groupOfGroups1;
-        groupOfGroups1 == nullptr;
+        groupOfGroups1 = nullptr;
     }
 }
 
@@ -453,7 +453,7 @@ void GroupOfGroups::removePlayerID(int player_id)
     Player player = node->getInfo();
     int level = player.getLevel();
     int score = player.getScore();
-    int GroupID = player.getGroupId();
+//    int GroupID = player.getGroupId();
     playersHT.HashTableDelete(player_id);
 
     if(level != 0)
