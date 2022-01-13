@@ -390,19 +390,24 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
     }
     try
     {
+        if((higherLevel < lowerLevel)  ||  higherLevel < 0)
+        {
+            return FAILURE;
+        }
+
         if(GroupID == 0)
         {
             double denominator =0;
             double nominator =0;
 
-            if(lowerLevel == 0 && higherLevel == 0)
+            if(lowerLevel <= 0 && higherLevel == 0)
             {
                 int sum=0;
                 for (int i = 0; i < scale + 1; ++i) {
                     sum+= scaleLevel0Array[i];
                 }
                 denominator += sum;
-                if(denominator == 0 && (score> scale || score <=0))
+                if(denominator == 0 )
                 {
                     return FAILURE;
                 }
@@ -415,84 +420,71 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
                 *players = (nominator/denominator) * 100 ;
                 return SUCCESS;
             }
-
-            if(lowerLevel <=0)
-            {
-                int sum=0;
-                for (int i = 0; i < scale + 1; ++i) {
-                    sum+= scaleLevel0Array[i];
-                }
-                denominator += sum;
-                nominator += scaleLevel0Array[score];
-            }
-            if(higherLevel >=0)
-            {
-
-            }
             else
             {
+                if(lowerLevel <=0 && higherLevel > 0)
+                {
+                    int sum=0;
+                    for (int i = 0; i < scale + 1; ++i) {
+                        sum+= scaleLevel0Array[i];
+                    }
+                    denominator += sum;
+                    if( !(score> scale || score <=0))
+                    {
+                        nominator += scaleLevel0Array[score];
+                    }
+                }
+
                 auto LBnodeGlobal = level_and_number_player_tree->findClosestNodeFromAbove(level_and_number_player_tree,lowerLevel);
                 auto HBnodeGlobal = level_and_number_player_tree->findClosestNodeFromBeneath(level_and_number_player_tree,higherLevel);
 
-                if(HBnodeGlobal== nullptr || LBnodeGlobal== nullptr || HBnodeGlobal->getKey().getLevel() < LBnodeGlobal->getKey().getLevel())
+                if(HBnodeGlobal!= nullptr && LBnodeGlobal != nullptr)
                 {
-                    return FAILURE; // catch FAILURE in DS func
-                }
-
-                int higher_than_HB_G = level_and_number_player_tree->sumInfoOfHighest(level_and_number_player_tree,HBnodeGlobal->getKey()) - HBnodeGlobal->getKey().getNumber();
-                int lower_than_LB_G = level_and_number_player_tree->sumInfoOfLowest(level_and_number_player_tree,LBnodeGlobal->getKey()) - LBnodeGlobal->getKey().getNumber();
-                denominator = level_and_number_player_tree->getInfo() - lower_than_LB_G - higher_than_HB_G;
-
-                if(denominator == 0 && (score> scale || score <=0))
-                {
-                    return FAILURE;
-                }
-                if(denominator > 0 && (score> scale || score <=0))
-                {
-                    *players = 0;
-                    return SUCCESS;
-                }
-
-
-                auto LBnode = scaleTreeArray[score]->findClosestNodeFromAbove(scaleTreeArray[score],lowerLevel);
-                auto HBnode = scaleTreeArray[score]->findClosestNodeFromBeneath(scaleTreeArray[score],higherLevel);
-
-                if(scaleTreeArray[score] == nullptr)
-                {
-                    if(lowerLevel <= 0)
+                    int higher_than_HB_G = level_and_number_player_tree->sumInfoOfHighest(level_and_number_player_tree,HBnodeGlobal->getKey()) - HBnodeGlobal->getKey().getNumber();
+                    int lower_than_LB_G = level_and_number_player_tree->sumInfoOfLowest(level_and_number_player_tree,LBnodeGlobal->getKey()) - LBnodeGlobal->getKey().getNumber();
+                    denominator = level_and_number_player_tree->getInfo() - lower_than_LB_G - higher_than_HB_G;
+                    if(denominator == 0)
                     {
-                        if(scaleLevel0Array[score] == 0)
-                        {
-                            *players = 0;
-                            return SUCCESS;
-                        }
-                        else
-                        {
-                            nominator = scaleLevel0Array[score];
-                        }
+                        return FAILURE; // catch FAILURE in DS func
                     }
-                    else
+                }
+
+                if(HBnodeGlobal== nullptr || LBnodeGlobal== nullptr ) // removed || HBnodeGlobal->getKey().getLevel() < LBnodeGlobal->getKey().getLevel()
+                {
+                    if(denominator == 0)
                     {
-                        *players = 0;
+                        return FAILURE; // catch FAILURE in DS func
+                    }
+                }
+
+                if( !(score> scale || score <=0))
+                {
+                    auto LBnode = scaleTreeArray[score]->findClosestNodeFromAbove(scaleTreeArray[score],lowerLevel);
+                    auto HBnode = scaleTreeArray[score]->findClosestNodeFromBeneath(scaleTreeArray[score],higherLevel);
+
+                    if(!(HBnode== nullptr || LBnode== nullptr ))
+                    {
+                        int higher_than_HB = scaleTreeArray[score]->sumInfoOfHighest(scaleTreeArray[score],HBnode->getKey()) - HBnode->getKey().getNumber();
+                        int lower_than_LB = scaleTreeArray[score]->sumInfoOfLowest(scaleTreeArray[score],LBnode->getKey()) - LBnode->getKey().getNumber();
+                        nominator = scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
+
+                        *players = (nominator/denominator)*100;
+                        return SUCCESS;
+                    }
+
+                    if(HBnode== nullptr || LBnode== nullptr )
+                    {
+                        *players = (nominator/denominator)*100;
                         return SUCCESS;
                     }
                 }
                 else
                 {
-                    if(HBnode== nullptr || LBnode== nullptr || HBnode->getKey().getLevel() < LBnode->getKey().getLevel())
-                    {
-                        return FAILURE; // catch FAILURE in DS func
-                    }
-
-                    int higher_than_HB = scaleTreeArray[score]->sumInfoOfHighest(scaleTreeArray[score],HBnode->getKey()) - HBnode->getKey().getNumber();
-                    int lower_than_LB = scaleTreeArray[score]->sumInfoOfLowest(scaleTreeArray[score],LBnode->getKey()) - LBnode->getKey().getNumber();
-                    nominator = scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
+                    *players =0;
+                    return SUCCESS;
                 }
+
             }
-
-
-            *players = (nominator/denominator) * 100 ;
-            return SUCCESS;
         }
         else
         {
