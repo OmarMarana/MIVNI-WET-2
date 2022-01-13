@@ -442,7 +442,7 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
                 {
                     int higher_than_HB_G = level_and_number_player_tree->sumInfoOfHighest(level_and_number_player_tree,HBnodeGlobal->getKey()) - HBnodeGlobal->getKey().getNumber();
                     int lower_than_LB_G = level_and_number_player_tree->sumInfoOfLowest(level_and_number_player_tree,LBnodeGlobal->getKey()) - LBnodeGlobal->getKey().getNumber();
-                    denominator = level_and_number_player_tree->getInfo() - lower_than_LB_G - higher_than_HB_G;
+                    denominator += level_and_number_player_tree->getInfo() - lower_than_LB_G - higher_than_HB_G;
                     if(denominator == 0)
                     {
                         return FAILURE; // catch FAILURE in DS func
@@ -466,7 +466,7 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
                     {
                         int higher_than_HB = scaleTreeArray[score]->sumInfoOfHighest(scaleTreeArray[score],HBnode->getKey()) - HBnode->getKey().getNumber();
                         int lower_than_LB = scaleTreeArray[score]->sumInfoOfLowest(scaleTreeArray[score],LBnode->getKey()) - LBnode->getKey().getNumber();
-                        nominator = scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
+                        nominator += scaleTreeArray[score]->getInfo() - higher_than_HB  - lower_than_LB;
 
                         *players = (nominator/denominator)*100;
                         return SUCCESS;
