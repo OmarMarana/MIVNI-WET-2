@@ -25,7 +25,7 @@ PlayersManager::~PlayersManager()
 
 StatusType PlayersManager::PMmergeGroups( int GroupID1, int GroupID2)
 {
-    UF.Find(7);//REMOVE
+
     if(GroupID1 <=0 || GroupID2 <=0 || GroupID2 > k ||  GroupID1 > k)
     {
         return INVALID_INPUT;
@@ -49,7 +49,7 @@ StatusType PlayersManager::PMmergeGroups( int GroupID1, int GroupID2)
 
 StatusType PlayersManager::PMaddPlayer( int PlayerID, int GroupID, int score)
 {
-    UF.Find(7); // REMOVE
+
     if(GroupID <= 0 || GroupID > k || PlayerID <= 0 || score > scale || score <= 0)
     {
         return  INVALID_INPUT;
@@ -80,7 +80,7 @@ StatusType PlayersManager::PMaddPlayer( int PlayerID, int GroupID, int score)
 
 StatusType PlayersManager::PMremovePlayer(int PlayerID)
 {
-    UF.Find(7);
+
     if(PlayerID <=0 )
     {
         return  INVALID_INPUT;
@@ -139,12 +139,11 @@ StatusType PlayersManager::PMremovePlayer(int PlayerID)
 
         num_of_players--;
 
-        std::cout << "";
 
         UF.Find(GroupID)->removePlayerID(PlayerID);
 
         //UPDATE ON THE RELEVANT GROUP
-        std::cout << "";
+
 
     }
     catch(std::exception& e)
@@ -158,7 +157,7 @@ StatusType PlayersManager::PMremovePlayer(int PlayerID)
 
 StatusType PlayersManager::PMincreasePlayerIDLevel(int PlayerID, int LevelIncrease)
 {
-    UF.Find(7);//REMOVE
+
     if(PlayerID <= 0 || LevelIncrease <= 0)
     {
         return  INVALID_INPUT;
@@ -301,8 +300,8 @@ StatusType PlayersManager::PMincreasePlayerIDLevel(int PlayerID, int LevelIncrea
         }
 
         UF.Find(GroupID)->increaseLevel(PlayerID,LevelIncrease);
-        UF.Find(7); //REMOVE
-//        std::cout<<"";
+
+
     }
     catch(std::exception& e)
     {
@@ -315,7 +314,7 @@ StatusType PlayersManager::PMincreasePlayerIDLevel(int PlayerID, int LevelIncrea
 
 StatusType PlayersManager::PMchangePlayerIDScore(int PlayerID, int NewScore)
 {
-    UF.Find(7);//REMOVE
+
     if(PlayerID <= 0 || NewScore <=0 || NewScore > scale)
     {
         return INVALID_INPUT;
@@ -385,7 +384,7 @@ StatusType PlayersManager::PMchangePlayerIDScore(int PlayerID, int NewScore)
 
 StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID, int score, int lowerLevel, int higherLevel, double * players)
 {
-    UF.Find(7);//REMOVE
+
     if(players == nullptr || GroupID < 0 || GroupID > k)
     {
         return  INVALID_INPUT;
@@ -509,7 +508,7 @@ StatusType PlayersManager::PMgetPercentOfPlayersWithScoreInBounds ( int GroupID,
 
 StatusType PlayersManager::PMaverageHighestPlayerLevelByGroup( int GroupID, int m, double * avgLevel)
 {
-    UF.Find(7);//REMOVE
+
     if(avgLevel == nullptr || GroupID < 0 || GroupID > k || m <= 0)
     {
         return  INVALID_INPUT;
