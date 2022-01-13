@@ -7,7 +7,7 @@
 
 #include "LinkedList.h"
 #include <cmath>
-#define A  (sqrt(5) -1)/2
+#define A  ((sqrt(5)) -1)/2
 #define SHRINK 4
 #define EXPAND 2
 
@@ -62,10 +62,11 @@ void HashTable<T,S>::resizeHashTable()
 {
     if(num_of_elements == size)
     {
+        int old_size = size;
         size =  EXPAND * size;
         auto new_hash_table = new LinkedList<T,S>[size];
-        CopyElements(new_hash_table, hash_table, size/EXPAND);
-        for (int i = 0; i < size/EXPAND ; ++i)
+        CopyElements(new_hash_table, hash_table, old_size);
+        for (int i = 0; i < old_size; ++i)
         {
             hash_table[i].clearList();
         }
@@ -77,10 +78,11 @@ void HashTable<T,S>::resizeHashTable()
     }
     if(num_of_elements== size/SHRINK)
     {
+        int old_size = size;
         size =   size/EXPAND;
         auto new_hash_table = new LinkedList<T,S>[size];
-        CopyElements(new_hash_table, hash_table, size * EXPAND);
-        for (int i = 0; i < size*EXPAND ; ++i)
+        CopyElements(new_hash_table, hash_table, old_size);
+        for (int i = 0; i < old_size; ++i)
         {
             hash_table[i].clearList();
         }

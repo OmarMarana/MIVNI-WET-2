@@ -139,10 +139,12 @@ StatusType PlayersManager::PMremovePlayer(int PlayerID)
 
         num_of_players--;
 
+        std::cout << "";
 
         UF.Find(GroupID)->removePlayerID(PlayerID);
 
         //UPDATE ON THE RELEVANT GROUP
+        std::cout << "";
 
     }
     catch(std::exception& e)

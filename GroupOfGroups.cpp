@@ -158,9 +158,10 @@ HashTable<Player,int>* GroupOfGroups::GetPlayersHT()
 
 void GroupOfGroups::mergeGroupOfGroupsHelper(GroupOfGroups* groupOfGroups_dest , GroupOfGroups* groupOfGroups_src)
 {
+    groupOfGroups_src->GetPlayersHT()->HashTableSearch(948171058);
     auto src_HT = groupOfGroups_src->GetPlayersHT();
     auto dest_HT = groupOfGroups_dest->GetPlayersHT();
-    for (int i = 0; i < src_HT->getSize(); ++i)
+    for (int i = 0; i < src_HT->getSize() ; ++i)
     {
         auto tmp = (*src_HT).getHT()[i].LinkedListGetHead();
         while (tmp != nullptr)
@@ -432,11 +433,12 @@ void GroupOfGroups::increaseLevel(int player_id , int delta)
 
 void GroupOfGroups::addPlayerID(int player_id, int group_id, int score)
 {
+    playersHT.HashTableSearch(948171058);
     Player player(player_id,group_id,score);
     playersHT.HashTableInsert(player,player_id);
 
     scaleLevel0Array[score]++;
-
+    playersHT.HashTableSearch(948171058);//REMOVE
     num_of_players++;
 }
 
