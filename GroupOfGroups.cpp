@@ -399,7 +399,7 @@ void GroupOfGroups::increaseLevel(int player_id , int delta)
         if(old_number1  != 1)
         {
 //            int old_number = lnNode->getKey().getNumber();
-            LevelAndNumber ln1(old_level , old_number-1);
+            LevelAndNumber ln1(old_level , old_number1-1);
             scaleTreeArray[score] = scaleTreeArray[score]->insert(scaleTreeArray[score],ln1,0);
             scaleTreeArray[score] = scaleTreeArray[score]->treeBalance(scaleTreeArray[score]->find(scaleTreeArray[score],ln1));
         }
