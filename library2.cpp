@@ -91,5 +91,7 @@ void Quit(void** DS)
     *DS= nullptr;
 
 }
-//StatusType GetPlayersBound(void *DS, int GroupID, int score, int m,
-//                           int * LowerBoundPlayers, int * HigherBoundPlayers);
+StatusType GetPlayersBound(void *DS, int GroupID, int score, int m , int * LowerBoundPlayers, int * HigherBoundPlayers)
+{
+    return SUCCESS;
+}
